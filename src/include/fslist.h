@@ -5,10 +5,10 @@
 #include <stdbool.h>
 
 //! Unsigned integer type is required to indicate node index.
-typedef uint16_t fslistNodeIdx_t;
+typedef uint32_t fslistNodeIdx_t;
 
 //! Representation for null node.
-enum { fslist_nodeidx_none = (uint16_t)(-1) };
+enum { FSLIST_NODEIDX_NONE = ( fslistNodeIdx_t) ( -1 ) };
 
 /*! \brief      Node type for free spaced list
     \note       Since each node is represented as index from pre-allocated memory pool,
@@ -28,17 +28,17 @@ typedef struct fslistNode
 //! \brief Free space list type
 //! \warning Any member of this structure must not be modified directly.
 typedef struct fslist
-{
+{ 
+    //! \brief      Pointer to node pool.
+    //! \details    You can access to each nodes via "->pool[node_index];
+    fslistNode_t* pool;
+
     //! First available node
     fslistNodeIdx_t head;
     //! Last available node
     fslistNodeIdx_t tail;
     //! The first node of all available nodes.
     fslistNodeIdx_t availableHead;
-
-    //! \brief      Pointer to node pool.
-    //! \details    You can access to each nodes via "->pool[node_index];
-    fslistNode_t* pool;
     
     //! Pointer to data pool. Detached from the node pool to avoid dynamic allocation for each node creation.
     uint8_t* dataPool;
@@ -47,7 +47,7 @@ typedef struct fslist
     size_t poolCapacity;
     
     //! Currently active node count. 
-    size_t count;
+    size_t size;
 
     //! Size of allocated element type. 
     size_t elemSize;
@@ -80,4 +80,4 @@ fslistNodeIdx_t fslistGetOffset( fslist_t const* list, fslistNode_t const* node 
 fslistNode_t* fslistInsertNew( fslist_t* list, fslistNodeIdx_t node, void const* initData );
 
 /*! \brief      Removes a node from the list. */
-bool fslistErase( fslist_t* list, fslistNodeIdx_t* node );
+bool fslistErase( fslist_t* list, fslistNodeIdx_t node );
