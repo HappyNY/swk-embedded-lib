@@ -41,3 +41,9 @@ install(
 	TARGETS testcase
 	RUNTIME DESTINATION ${DEST_DIR_NAME}/test
 )
+
+# testapp
+aux_source_directory(testapp SRC_TESTAPP)
+add_executable(testapp ${SRC_TESTAPP})
+add_dependencies(testapp swk_embedded_c swk_embedded_cpp)
+target_link_libraries(testapp PUBLIC swk_embedded_c swk_embedded_cpp)

@@ -7,13 +7,14 @@ extern "C"
 #include <cstdlib>
 #include <tuple>
 
-TEST_CASE( "fslist features works correctly.", "[fslist]" )
+TEST_CASE( "fslist features perform correctly.", "[fslist]" )
 {
-    fslist list;
+    FreeSpaceList list;
     
     enum {
         CAP = 10000
     };
+    srand( CAP );
     fslistInit( &list, CAP, sizeof( double ) );
 
     INFO( "Testing parameter setups." );
@@ -36,7 +37,7 @@ TEST_CASE( "fslist features works correctly.", "[fslist]" )
     REQUIRE( list.pool[CAP - 1].pdata == NULL ); 
 
     // Allocate few nodes
-    std::vector<std::pair<double, fslistNodeIdx_t>> pairs;
+    std::vector<std::pair<double, FreeSpaceListNodeHandle>> pairs;
     for ( size_t i = 0, length = rand() % CAP; i < length; i++ )
     {
         double v = rand();
