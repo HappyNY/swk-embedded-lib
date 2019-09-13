@@ -4,10 +4,10 @@
 #include <string.h>
 
 #define assert_idx(idx) assert((idx) < list->poolCapacity)
-static inline void unlink( fslist_t* list, fslistNodeIdx_t a )
+static inline void unlink( FreeSpaceList* list, FreeSpaceListNodeHandle a )
 {
     assert_idx( a );
-    fslistNode_t* n = list->pool + a;
+    FreeSpaceListNode* n = list->pool + a;
     
     if ( n->next != FSLIST_NODEIDX_NONE ) 
         list->pool[n->next].prev = n->prev; 
@@ -19,12 +19,12 @@ static inline void unlink( fslist_t* list, fslistNodeIdx_t a )
     n->prev = FSLIST_NODEIDX_NONE;
 }
 
-static inline void link_after( fslist_t* list, fslistNodeIdx_t base, fslistNodeIdx_t node )
+static inline void link_after( FreeSpaceList* list, FreeSpaceListNodeHandle base, FreeSpaceListNodeHandle node )
 {
     assert_idx( base );
     assert_idx( node );
-    fslistNode_t* b = list->pool + base;
-    fslistNode_t* n = list->pool + node;
+    FreeSpaceListNode* b = list->pool + base;
+    FreeSpaceListNode* n = list->pool + node;
 
     unlink( list, node );
     
@@ -37,12 +37,12 @@ static inline void link_after( fslist_t* list, fslistNodeIdx_t base, fslistNodeI
     b->next = node;
 }
 
-static inline void link_before( fslist_t* list, fslistNodeIdx_t base, fslistNodeIdx_t node )
+static inline void link_before( FreeSpaceList* list, FreeSpaceListNodeHandle base, FreeSpaceListNodeHandle node )
 {
     assert_idx( base );
     assert_idx( node );
-    fslistNode_t* b = list->pool + base;
-    fslistNode_t* n = list->pool + node;
+    FreeSpaceListNode* b = list->pool + base;
+    FreeSpaceListNode* n = list->pool + node;
 
     unlink( list, node );
     
@@ -55,7 +55,7 @@ static inline void link_before( fslist_t* list, fslistNodeIdx_t base, fslistNode
     b->prev = node;
 }
 
-static inline void alloc_data( fslist_t* list, void const* initData, fslistNodeIdx_t target )
+static inline void alloc_data( FreeSpaceList* list, void const* initData, FreeSpaceListNodeHandle target )
 {
     assert_idx( target );
     assert( list->pool[target].pdata == NULL );
@@ -68,7 +68,7 @@ static inline void alloc_data( fslist_t* list, void const* initData, fslistNodeI
         memcpy( ptr, initData, list->elemSize );
 }
 
-static inline void free_data( fslist_t* list, fslistNodeIdx_t target )
+static inline void free_data( FreeSpaceList* list, FreeSpaceListNodeHandle target )
 {
     assert_idx( target );
     assert( list->pool[target].pdata != NULL );
@@ -78,19 +78,19 @@ static inline void free_data( fslist_t* list, fslistNodeIdx_t target )
     list->dtorCallback( ptr );
 }
 
-fslistNodeIdx_t fslistGetOffset( fslist_t const* list, fslistNode_t const* node )
+FreeSpaceListNodeHandle fslistGetOffset( FreeSpaceList const* list, FreeSpaceListNode const* node )
 {
     if ( node < list->pool || node >= list->pool + list->poolCapacity ) 
         return FSLIST_NODEIDX_NONE; 
     else
-        return ( fslistNodeIdx_t) ( node - list->pool );
+        return ( FreeSpaceListNodeHandle) ( node - list->pool );
 }
 
 static void nulldtor( void* placeholder ) {}
 
-bool fslistInit( fslist_t* list, size_t initCapacity, size_t elementSize )
+bool fslistInit( FreeSpaceList* list, size_t initCapacity, size_t elementSize )
 {
-    list->pool = ( fslistNode_t*) malloc( initCapacity * sizeof( fslistNode_t ) );
+    list->pool = ( FreeSpaceListNode*) malloc( initCapacity * sizeof( FreeSpaceListNode ) );
     list->dataPool = ( uint8_t*) malloc( initCapacity * elementSize );
 
     // Memory allcoation has failed ...
@@ -111,8 +111,8 @@ bool fslistInit( fslist_t* list, size_t initCapacity, size_t elementSize )
     // Link all available nodes 
     // This process is to make searching available node easier.
     {
-        fslistNode_t* pool = list->pool;
-        fslistNodeIdx_t head = 0;
+        FreeSpaceListNode* pool = list->pool;
+        FreeSpaceListNodeHandle head = 0;
 
         // the first and last node need to be initialized separately.
         pool[0].prev = FSLIST_NODEIDX_NONE;
@@ -130,7 +130,7 @@ bool fslistInit( fslist_t* list, size_t initCapacity, size_t elementSize )
     return true;
 }
 
-bool fslistDestroy( fslist_t* list )
+bool fslistDestroy( FreeSpaceList* list )
 {
     // Destroy all active nodes
     // Destructors will be automatically called.
@@ -145,9 +145,9 @@ bool fslistDestroy( fslist_t* list )
     return true;
 }
 
-fslistNode_t* fslistInsertNew( fslist_t* list, fslistNodeIdx_t node, void const* initData )
+FreeSpaceListNode* fslistInsertNew( FreeSpaceList* list, FreeSpaceListNodeHandle node, void const* initData )
 { 
-    fslistNodeIdx_t gen = list->availableHead;
+    FreeSpaceListNodeHandle gen = list->availableHead;
     list->availableHead = list->pool[gen].next;
     unlink( list, gen );
     // Mandates handling initdata to ctor.
@@ -180,7 +180,7 @@ fslistNode_t* fslistInsertNew( fslist_t* list, fslistNodeIdx_t node, void const*
     return list->pool + gen;
 }
 
-bool fslistErase( fslist_t* list, fslistNodeIdx_t node )
+bool fslistErase( FreeSpaceList* list, FreeSpaceListNodeHandle node )
 {
     assert_idx( node );
     assert( list->pool[node].pdata != NULL );
@@ -191,7 +191,7 @@ bool fslistErase( fslist_t* list, fslistNodeIdx_t node )
     if ( node == list->tail )
         list->tail = list->pool[node].prev;
 
-    fslistNodeIdx_t avhead = list->availableHead;
+    FreeSpaceListNodeHandle avhead = list->availableHead;
     list->availableHead = node;
     link_before( list, avhead, node );
 
