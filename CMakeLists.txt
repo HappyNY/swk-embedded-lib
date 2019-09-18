@@ -1,40 +1,36 @@
 cmake_minimum_required(VERSION 2.8)
 
-project(swk_c_container)
+project(uembedded_c)
 
-set(SRC_C_INC_DIR "src-embedded-clib/include/")
-set(SRC_CPP_INC_DIR "src-embedded-cpplib/include/")
-set(DEST_DIR_NAME "swk-embedded-lib")
+set(SRC_C_INC_DIR "src/include/")
+set(DEST_DIR_NAME "uembedded_c")
 
 include_directories(${SRC_C_INC_DIR})
 include_directories(${SRC_CPP_INC_DIR})
 
-aux_source_directory("src-embedded-clib" SRC_C)
-aux_source_directory("src-embedded-cpplib" SRC_CPP)
+aux_source_directory("src" SRC_C) 
 aux_source_directory(testcase TESTCASE)
 
 # Core library build.
-add_library(swk_embedded_c STATIC ${SRC_C})
-add_library(swk_embedded_cpp STATIC ${SRC_CPP})
+add_library(uembedded_c STATIC ${SRC_C}) 
 
 # Testcase build.
 include_directories("./third/Catch2/single_include/")
 add_executable(testcase ${TESTCASE})
-add_dependencies(testcase swk_embedded_c swk_embedded_cpp)
-target_link_libraries(testcase PUBLIC swk_embedded_c swk_embedded_cpp)
+add_dependencies(testcase uembedded_c)
+target_link_libraries(testcase PUBLIC uembedded_c)
 
 # Install settings
 # Install libraries
 install( 
-	TARGETS swk_embedded_c swk_embedded_cpp
+	TARGETS uembedded_c
 	RUNTIME DESTINATION ${DEST_DIR_NAME}/bin
 	LIBRARY DESTINATION ${DEST_DIR_NAME}/lib
 	ARCHIVE DESTINATION ${DEST_DIR_NAME}/lib
 )
 
 # Install includes 
-install( DIRECTORY ${SRC_C_INC_DIR} DESTINATION ${DEST_DIR_NAME}/include )
-install( DIRECTORY ${SRC_CPP_INC_DIR} DESTINATION ${DEST_DIR_NAME}/include )
+install( DIRECTORY ${SRC_C_INC_DIR} DESTINATION ${DEST_DIR_NAME}/include ) 
 
 # Install tests
 install(
@@ -45,5 +41,5 @@ install(
 # testapp
 aux_source_directory(testapp SRC_TESTAPP)
 add_executable(testapp ${SRC_TESTAPP})
-add_dependencies(testapp swk_embedded_c swk_embedded_cpp)
-target_link_libraries(testapp PUBLIC swk_embedded_c swk_embedded_cpp)
+add_dependencies(testapp uembedded_c)
+target_link_libraries(testapp PUBLIC uembedded_c)
