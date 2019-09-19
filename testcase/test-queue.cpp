@@ -41,7 +41,7 @@ TEST_CASE( "Queue functionality test", "[Queue]" )
 
         for ( auto& str : init )
         {
-            strcpy( ( char*) queue_allocator_push( &s, str.size() + 1 ), str.c_str() );
+            strcpy_s( ( char*) queue_allocator_push( &s, str.size() + 1 ), str.size() + 1, str.c_str() );
         }
 
         for ( auto& str : init )
