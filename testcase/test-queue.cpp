@@ -23,7 +23,8 @@ static void gen_random( char* s, const int len ) {
 TEST_CASE( "Queue functionality test", "[Queue]" )
 {
     queue_allocator s;
-    queue_allocator_init( &s, &g_mallocator, 200000 );
+    size_t const cap = 200000;
+    queue_allocator_init( &s, malloc( cap ), cap );
 
     std::vector<std::string> init;
     char buff[128];
@@ -52,5 +53,7 @@ TEST_CASE( "Queue functionality test", "[Queue]" )
             queue_allocator_pop( &s );
         }
     }
+
+    free( s.buff );
 } 
  

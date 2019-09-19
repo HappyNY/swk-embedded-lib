@@ -5,20 +5,15 @@
 
 struct queue_allocator
 {
-    allocator_ref_t allocator;
     size_t head;
     size_t tail;
     size_t cap;
     size_t cnt;
     char* buff;
-};
+}; 
 
-
-/*! \brief Initialize queue allcoator. */
-void queue_allocator_init( struct queue_allocator* s, allocator_ref_t alloc, size_t capacity );
-
-/*! \brief Destroy allocator */
-void queue_allocator_destroy( struct queue_allocator* s );
+/*! \brief Initialize queue allcoator. Deinitiation of queue alloator can simply be done by releasing memory on \ref queue_allocator::buff */
+void queue_allocator_init( struct queue_allocator* s, void* buff, size_t capacity );
 
 /*! \brief Push new data into queue. 
     \details 

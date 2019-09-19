@@ -2,20 +2,14 @@
 #include <assert.h>
 #include <stdbool.h>
 
-void queue_allocator_init( struct queue_allocator* s, allocator_ref_t alloc, size_t capacity )
+void queue_allocator_init( struct queue_allocator* s, void* buff, size_t capacity )
 {
-    s->allocator = alloc;
     capacity = ( capacity + sizeof( size_t ) - 1 ) & ~( sizeof( size_t ) - 1 );
-    s->buff = s->allocator->allocate( s->allocator->object, capacity );
+    s->buff = ( char*) buff;
     s->head = 0;
     s->tail = 0;
     s->cnt = 0;
     s->cap = capacity;
-}
-
-void queue_allocator_destroy( struct queue_allocator* s )
-{
-    s->allocator->release( s->allocator->object, s->buff );
 }
 
 void* queue_allocator_push( struct queue_allocator* s, size_t size )
