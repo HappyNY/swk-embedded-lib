@@ -49,12 +49,14 @@ typedef struct transceiver_vtable* tranceiver_desc_t;
 //! \brief      Tries to read data from transciever. 
 //! \param      
 //! \returns Zero if buffer is empty. Otherwise positive return value indicates number of actual data read.
+static inline 
 transceiver_result_t td_tryRead( tranceiver_desc_t td, char* buf, size_t rdcnt )
 {
     return td->tryRead( ( void*) td, buf, rdcnt );
 }
 
 //! \brief Read data from the transceiver. It blocks until reading all 'rdcnt' bytes of data.
+static inline
 transceiver_result_t td_read( tranceiver_desc_t td, char* buf, size_t rdcnt )
 {
     size_t trres;
@@ -74,6 +76,7 @@ transceiver_result_t td_read( tranceiver_desc_t td, char* buf, size_t rdcnt )
 }
 
 //! \brief Write data into tranceiver.
+static inline
 transceiver_result_t td_write( tranceiver_desc_t td, char const* buf, size_t wrcnt )
 {
     return td->write( ( void*) td, buf, wrcnt );
