@@ -5,6 +5,7 @@
 struct timer_logic
 {
     struct fslist nodes;
+    size_t idGen;
 };
 
 struct timer_logic_info

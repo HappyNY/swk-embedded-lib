@@ -15,7 +15,7 @@ size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSi
     if ( cap > FSLIST_NUM_MAX_NODE )
     {
         uemb_assert( false );
-        return -1;
+        return 0;
     }
     s->capacity = ( fslist_idx_t) ( cap );
     s->get = ( struct fslist_node* ) s->buff;
