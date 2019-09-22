@@ -48,7 +48,7 @@ struct fslist_node
     fslist_idx_t prev;
     fslist_idx_t next;
     //!         This variable will help to prevent mistakes
-    void* object; 
+    bool object; 
 };
 
 /*! \brief      Initiate node struct 
@@ -61,7 +61,7 @@ size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSi
 static inline
 bool fslist_node_in_range( struct fslist const* s, struct fslist_node const* n )
 {
-    return n < s->get + s->capacity && s->get < n;
+    return n < s->get + s->capacity && s->get <= n;
 }
 
 /*! \brief      Get index of list node */
@@ -106,7 +106,7 @@ void fslist_forEach( struct fslist* s, void( *callback )( void* ) )
         return;
 
     for ( n = s->get + s->head; n; n = fslist_next( s, n ) )
-        callback( n->object );
+        callback( fslist_data( s, n ) );
 }
 
 /*! \brief      Insert new node previous given node. Pass nullptr to push back. */
