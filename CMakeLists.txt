@@ -2,14 +2,13 @@ cmake_minimum_required(VERSION 2.8)
 
 project(uembedded_c)
 
-set(DEST_DIR_NAME "uembedded_c")
-
+set(DEST_DIR_NAME "uembedded_c") 
 set(SRC_C_INC_DIR "src")
 
 include_directories(${SRC_C_INC_DIR})
 include_directories(${SRC_CPP_INC_DIR})
 
-aux_source_directory("src" SRC_C) 
+aux_source_directory("src/uEmbedded" SRC_C) 
 aux_source_directory(testcase TESTCASE)
 
 # Core library build.
@@ -31,8 +30,8 @@ install(
 )
 
 # Install includes 
-install( FILES "src/*.h" DESTINATION ${DEST_DIR_NAME}/include ) 
-install( FILES "src/*.hpp" DESTINATION ${DEST_DIR_NAME}/include ) 
+install( FILES "src/uEmbedded/*.h" DESTINATION ${DEST_DIR_NAME}/include ) 
+install( FILES "src/uEmbedded/*.hpp" DESTINATION ${DEST_DIR_NAME}/include ) 
 
 # Install tests
 install(

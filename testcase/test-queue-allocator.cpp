@@ -1,7 +1,7 @@
 extern "C"
 {
-#include "queue_allocator.h"
-#include "event-procedure.h"
+#include "uEmbedded/queue_allocator.h"
+#include "uEmbedded/event-procedure.h"
 }
 #include <catch2/catch.hpp>
 #include <string>

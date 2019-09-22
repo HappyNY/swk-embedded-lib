@@ -1,7 +1,7 @@
 #include <Catch2/catch.hpp>
 extern "C"
 {
-#include <timer_logic.h>
+#include <uEmbedded/timer_logic.h>
 }
 
 TEST_CASE( "Timer logic functionality test", "[timer-logic]" )

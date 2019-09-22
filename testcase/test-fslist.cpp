@@ -1,8 +1,9 @@
 #include <Catch2/catch.hpp>
 
 extern "C" {
-#include <fslist.h>
+#include <uEmbedded/fslist.h>
 }
+int v;
 
 TEST_CASE( "fslist functionalities.", "[fslist]" )
 {
