@@ -19,9 +19,9 @@ inline size_t bundleSize( size_t paramSize )
     return sizeof( struct queueArg ) + paramSize;
 }
 
-void InitEventProcedure( struct EventQueue* queue, allocator_ref_t allocator, size_t bufferCapacity )
+void InitEventProcedure( struct EventQueue* queue, void* buff, size_t bufferCapacity )
 {
-    queue_allocator_init( &queue->queue, allocator, bufferCapacity );
+    queue_allocator_init( &queue->queue, buff, bufferCapacity );
 }
 
 void FlushEvents( struct EventQueue* queue )

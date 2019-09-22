@@ -23,7 +23,7 @@ void* queue_allocator_push( struct queue_allocator* s, size_t size )
         *( size_t*) ( s->buff + s->head ) = 0;
         s->head = 0;
     }
-    if ( s->cnt && s->head <= s->tail && s->head + jmpSize > s->tail )
+    if ( s->cnt && s->head <= s->tail && s->head + jmpSize >= s->tail )
     {
         uemb_assert( false );
         return NULL;

@@ -27,7 +27,7 @@ struct EventQueue
     \param queueSize Allocated memory size of parameter queue.
     \param buffer Since the dynamic allocation is not recommendable inside of the queue initialization process, the user should provide a specific memory block that will be valid during queue usage. Therefore deallocation of the allocated memory is up to the user.
     \note Internal queue will be implemented as circular queue. */
-void InitEventProcedure( struct EventQueue* queue, allocator_ref_t allocator, size_t bufferCapacity );
+void InitEventProcedure( struct EventQueue* queue, void* buff, size_t bufferCapacity );
 
 /*! \brief Flush all queue elements. Right after finishing this job, you can release the memory. 
     \warning If there is an event that repeatedly enqueues itself, this function may not return the program handle. */

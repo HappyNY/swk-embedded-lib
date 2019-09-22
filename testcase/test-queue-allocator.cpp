@@ -23,7 +23,7 @@ static void gen_random( char* s, const int len ) {
 TEST_CASE( "Queue functionality test", "[Queue]" )
 {
     queue_allocator s;
-    size_t const cap = 200000;
+    size_t const cap = 300000;
     queue_allocator_init( &s, malloc( cap ), cap );
 
     std::vector<std::string> init;
@@ -49,7 +49,10 @@ TEST_CASE( "Queue functionality test", "[Queue]" )
             size_t placeholder;
             auto a = ( char*) queue_allocator_peek( &s, &placeholder );
             auto b = str.data();
-            CHECK( strcmp( a, b ) == 0 );
+            INFO( "A: " << a << "\n" );
+            INFO( "B: " << b << "\n" );
+            INFO( s.cnt << " " << lp );
+            REQUIRE( strcmp( a, b ) == 0 );
             queue_allocator_pop( &s );
         }
     }
