@@ -48,7 +48,7 @@ struct fslist_node
     fslist_idx_t prev;
     fslist_idx_t next;
     //!         This variable will help to prevent mistakes
-    bool object; 
+    bool isValid; 
 };
 
 /*! \brief      Initiate node struct 
@@ -91,7 +91,7 @@ struct fslist_node* fslist_prev( struct fslist* s, struct fslist_node* n )
 /*! \brief      Get data from node 
     \warning    This function is deprecated. */
 static inline
-void* fslist_data( struct fslist* s, struct fslist_node* n )
+void* fslist_data( struct fslist* s, struct fslist_node const* n )
 {
     return ( void*) ( s->data + ( fslist_idx( s, n ) * s->elemSize ) );
 }

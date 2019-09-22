@@ -19,7 +19,7 @@ TEST_CASE( "fslist functionalities.", "[fslist]" )
         REQUIRE( fslist_idx( &v, n ) == v.tail );
         REQUIRE( fslist_idx( &v, n ) == v.head );
         REQUIRE( v.size == 1 );
-        REQUIRE( n->object );
+        REQUIRE( n->isValid );
         REQUIRE( n->next == FSLIST_NODEIDX_NONE );
         REQUIRE( n->prev == FSLIST_NODEIDX_NONE );
 

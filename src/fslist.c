@@ -31,7 +31,7 @@ size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSi
     {
         s->get[it].next = ( fslist_idx_t) ( it + 1 );
         s->get[it].prev = ( fslist_idx_t) ( it - 1 );
-        s->get[it].object = false;
+        s->get[it].isValid = false;
     }
     s->get[s->capacity - 1].next = FSLIST_NODEIDX_NONE;
 
@@ -45,7 +45,7 @@ struct fslist_node* fslist_insert( struct fslist* s, struct fslist_node* n )
 
     uemb_assert( s->inactive != FSLIST_NODEIDX_NONE );
     uemb_assert( n == NULL || fslist_node_in_range( s, n ) );
-    uemb_assert( n == NULL || n->object );
+    uemb_assert( n == NULL || n->isValid );
 
     // Allocate new node and insert before given node
     newNode = s->get + s->inactive;
@@ -85,7 +85,7 @@ struct fslist_node* fslist_insert( struct fslist* s, struct fslist_node* n )
             s->get[newNode->prev].next = newNodeIdx;
     }
 
-    newNode->object = true;
+    newNode->isValid = true;
     ++s->size;
     return newNode;
 }
@@ -96,7 +96,7 @@ void fslist_erase( struct fslist* s, struct fslist_node* n )
     
     uemb_assert( nidx != FSLIST_NODEIDX_NONE );
     uemb_assert( s->size );
-    uemb_assert( n->object );
+    uemb_assert( n->isValid );
 
     // Unlink from active list
     if ( n->next != FSLIST_NODEIDX_NONE )
@@ -115,6 +115,6 @@ void fslist_erase( struct fslist* s, struct fslist_node* n )
     n->next = s->inactive;
     s->inactive = nidx;
     
-    n->object = false;
+    n->isValid = false;
     --s->size;
 }
