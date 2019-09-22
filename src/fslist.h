@@ -20,7 +20,7 @@ struct fslist
     fslist_idx_t tail;
 
     //! \brief      First reference of inactive(=available) node.
-    fslist_idx_t nodeInactive;
+    fslist_idx_t inactive;
 
     //! \brief      Number of maximum nodes.
     fslist_idx_t capacity;
@@ -46,13 +46,15 @@ struct fslist_node
 {
     fslist_idx_t prev;
     fslist_idx_t next;
+    //!         This variable will help to prevent mistakes
+    void* object; 
 };
 
 /*! \brief      Initiate node struct 
     \param      buff Buffer to be used internally. This memory chunk must be valid during usage. After the deallocation of fslist, the finalization of this memory chunk is up to the programmer. 
     \param      buffSize Size of passed buffer.
     \returns    Number of actual available nodes. */
-size_t fslist_init( struct fslist* s, void* buff, size_t buffSize );
+size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize );
 
 /*! brief       Checks if given node is the node of given list s */
 static inline
@@ -85,7 +87,8 @@ struct fslist_node* fslist_prev( struct fslist* s, struct fslist_node* n )
     return n->prev != FSLIST_NODEIDX_NONE ? s->get + n->prev : NULL;
 }
 
-/*! \brief      Get data from node */
+/*! \brief      Get data from node 
+    \warning    This function is deprecated. */
 static inline
 void* fslist_data( struct fslist* s, struct fslist_node* n )
 {
@@ -102,26 +105,11 @@ void fslist_forEach( struct fslist* s, void( *callback )( void* ) )
         return;
 
     for ( n = s->get + s->head; n; n = fslist_next( s, n ) )
-        callback( fslist_data( s, n ) );
+        callback( n->object );
 }
 
 /*! \brief      Insert new node previous given node. Pass nullptr to push back. */
 struct fslist_node* fslist_insert( struct fslist* s, struct fslist_node* n );
 
 /*! \brief      Remove given node from list. */
-struct fslist_node* fslist_erase( struct fslist* s, struct fslist_node* n );
-
-/*! \brief      Append new node at last. */
-void fslist_pushBack( struct fslist* s );
-
-/*! \brief       Append new node at first */
-static inline
-void fslist_pushFront( struct fslist* s );
-
-/*! \brief      Pop node at last */
-static inline
-void fslist_popBack( struct fslist* s );
-
-/*! \brief      Pop node at first */
-static inline
-void fslist_popFront( struct fslist* s );
+void fslist_erase( struct fslist* s, struct fslist_node* n ); 
