@@ -8,7 +8,8 @@
 typedef uint16_t fslist_idx_t;
 
 //! \breif      Constant value that indicates invaid node index
-enum { FSLIST_NODEIDX_NONE = ( fslist_idx_t) -1; };
+enum { FSLIST_NODEIDX_NONE = ( fslist_idx_t) -1 };
+enum { FSLIST_NUM_MAX_NODE = ( fslist_idx_t) -1 };
 
 //! \brief      Free space list.
 struct fslist
@@ -58,7 +59,7 @@ size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSi
 
 /*! brief       Checks if given node is the node of given list s */
 static inline
-bool fslist_node_in_range( struct fslist* s, struct fslist_node* n )
+bool fslist_node_in_range( struct fslist const* s, struct fslist_node const* n )
 {
     return n < s->get + s->capacity && s->get < n;
 }
@@ -70,7 +71,7 @@ fslist_idx_t fslist_idx( struct fslist const* s, struct fslist_node const* n )
     if ( !fslist_node_in_range( s, n ) )
         return FSLIST_NODEIDX_NONE;
     else
-        return n - s->get;
+        return ( fslist_idx_t) ( n - s->get );
 }
 
 /*! \brief      Jump to next node */

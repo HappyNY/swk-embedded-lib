@@ -1,5 +1,5 @@
 #include "fslist.h"
-#include "assert.h"
+#include "uemb_assert.h"
 
 typedef struct fslist_node node_t;
 
@@ -7,10 +7,17 @@ size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSi
 {
     size_t chunkSize = elemSize + sizeof( struct fslist_node );
     size_t it;
+    size_t cap;
 
     s->buff = ( char*) buff;
     s->elemSize = elemSize;
-    s->capacity = buffSize / chunkSize;
+    cap = buffSize / chunkSize;
+    if ( cap > FSLIST_NUM_MAX_NODE )
+    {
+        uemb_assert( false );
+        return -1;
+    }
+    s->capacity = ( fslist_idx_t) ( cap );
     s->get = ( struct fslist_node* ) s->buff;
     s->data = s->buff + s->capacity * sizeof( struct fslist_node );
     
@@ -61,6 +68,9 @@ struct fslist_node* fslist_insert( struct fslist* s, struct fslist_node* n )
 
         // Replace to new tail
         s->tail = newNodeIdx;
+
+        if ( s->head == FSLIST_NODEIDX_NONE )
+            s->head = newNodeIdx;
     }
     else
     {

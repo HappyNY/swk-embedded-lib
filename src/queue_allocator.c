@@ -1,5 +1,5 @@
 #include "queue_allocator.h"
-#include "assert.h"
+#include "uemb_assert.h"
 #include <stdbool.h>
 
 void queue_allocator_init( struct queue_allocator* s, void* buff, size_t capacity )
