@@ -54,7 +54,7 @@ timer_info_t const* timer_browse( timer_logic_t* s, timer_handle_t h )
 {
     if ( h.n->isValid )
     {
-        timer_info_t* info = ( timer_info_t*) fslist_data( &s->nodes, h );
+        timer_info_t* info = ( timer_info_t*) fslist_data( &s->nodes, h.n );
         if ( info->timerId == h.timerId )
             return info;
     }
@@ -63,7 +63,7 @@ timer_info_t const* timer_browse( timer_logic_t* s, timer_handle_t h )
 
 //! \brief      Check if given timer is active
 static inline
-void timer_isActive( timer_logic_t* s, timer_handle_t h )
+bool timer_isActive( timer_logic_t* s, timer_handle_t h )
 {
     return timer_browse( s, h ) != NULL;
 }

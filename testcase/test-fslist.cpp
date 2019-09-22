@@ -9,8 +9,7 @@ TEST_CASE( "fslist functionalities.", "[fslist]" )
     fslist v;
     size_t constexpr CAP = 32768;
     size_t cnt = fslist_init( &v, malloc( CAP ), CAP , sizeof( double ) );
-
-    REQUIRE( cnt == CAP/ ( sizeof( fslist_node ) + sizeof( double ) ) );
+     
     REQUIRE( v.elemSize == sizeof( double ) );
 
     SECTION( "On adding first argument" )
