@@ -37,30 +37,33 @@ struct transceiver_vtable
     //! \brief      Notifies transceiver to try to connect. 
     //! \details    To make the connection process begin, all required parameters must be supplied before calling this function. 
     transceiver_result_t( *open )( void* /*obj*/ );
+    
+    //! \brief      Request close this transceiver.
+    transceiver_result_t( *close )( void* /*obj*/ ); 
 };
 
 //! Alias to easy use.
-typedef struct transceiver_vtable transceiver_vtable_t;
+typedef struct transceiver_vtable transceiver_vtable_t; 
 
 /*! \brief      The base type of all transceiver implementations.
     \details 
       This base type definition is recommended to be placed as the first member of any struct that wants to implement a transceiver interface. 
       Transceiver functions take transceiver_base_t instance as arguments, and virtual functions will be called by reinterpreting given arguments as the implementation struct that its value starts with given transceiver instance's address.
       Therefore, placing this base type at the mid of the other members can make the rest of the development process confusing.*/
-typedef struct transceiver_vtable* tranceiver_desc_t;
+typedef struct transceiver_vtable* transceiver_vptr_t;
 
 //! \brief      Tries to read data from transciever. 
 //! \param      
 //! \returns Zero if buffer is empty. Otherwise positive return value indicates number of actual data read.
 static inline 
-transceiver_result_t td_tryRead( tranceiver_desc_t td, char* buf, size_t rdcnt )
+transceiver_result_t td_tryRead( transceiver_vptr_t td, char* buf, size_t rdcnt )
 {
     return td->tryRead( ( void*) td, buf, rdcnt );
 }
 
 //! \brief Read data from the transceiver. It blocks until reading all 'rdcnt' bytes of data.
 static inline
-transceiver_result_t td_read( tranceiver_desc_t td, char* buf, size_t rdcnt )
+transceiver_result_t td_read( transceiver_vptr_t td, char* buf, size_t rdcnt )
 {
     transceiver_result_t trres;
     transceiver_result_t read;
@@ -81,7 +84,7 @@ transceiver_result_t td_read( tranceiver_desc_t td, char* buf, size_t rdcnt )
 
 //! \brief Write data into tranceiver.
 static inline
-transceiver_result_t td_write( tranceiver_desc_t td, char const* buf, size_t wrcnt )
+transceiver_result_t td_write( transceiver_vptr_t td, char const* buf, size_t wrcnt )
 {
     return td->write( ( void*) td, buf, wrcnt );
 }

@@ -1,4 +1,3 @@
-#pragma once
 #include <assert.h>
 
 void uemb_assert_impl_default( char const* expr, char const* file, char const* function, int line )

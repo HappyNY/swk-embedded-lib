@@ -49,17 +49,20 @@ void queue_allocator_pop( struct queue_allocator* s )
         return;
     }
 
-    size_t initTailPos = s->tail;
+    // size_t initTailPos = s->tail;
     jmpSize = *( size_t*) ( s->buff + s->tail );
 
-    s->tail += jmpSize;
-    --s->cnt;
-
-    if ( *( size_t*) ( s->buff + s->tail ) == 0 )
+    if ( jmpSize == 0 )
     {
         // Always points valid value.
         s->tail = 0; 
     }
+    else
+    {
+    	s->tail += jmpSize;
+    }
+
+    --s->cnt;
 }
 
 void* queue_allocator_peek( struct queue_allocator* s, size_t* size )
