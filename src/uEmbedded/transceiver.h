@@ -25,7 +25,7 @@ struct transceiver_vtable
 {
     //! \brief      This function must return control right away with any result.
     //! \details    If the connection is valid and there's nothing to read in the buffer or something, it should return zero to indicate that there's nothing to read.
-    transceiver_result_t( *tryRead )( void* /*obj*/, char* /*rdbuf*/, size_t/*rdcnt*/ );
+    transceiver_result_t( *status )( void* /*obj*/, char* /*rdbuf*/, size_t/*rdcnt*/ );
     
     //! \brief      If the connection is valid, this function must wait until the data receive.
     transceiver_result_t( *read )( void* /*obj*/, char* /*rdbuf*/, size_t/*rdcnt*/ );
@@ -56,9 +56,9 @@ typedef struct transceiver_vtable* transceiver_vptr_t;
 //! \param      
 //! \returns Zero if buffer is empty. Otherwise positive return value indicates number of actual data read.
 static inline 
-transceiver_result_t td_tryRead( transceiver_vptr_t td, char* buf, size_t rdcnt )
+transceiver_result_t td_status( transceiver_vptr_t td, char* buf, size_t rdcnt )
 {
-    return td->tryRead( ( void*) td, buf, rdcnt );
+    return td->status( ( void*) td, buf, rdcnt );
 }
 
 //! \brief Read data from the transceiver. It blocks until reading all 'rdcnt' bytes of data.
