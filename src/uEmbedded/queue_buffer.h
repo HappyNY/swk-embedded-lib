@@ -41,3 +41,11 @@ void queue_buffer_pop( queue_buffer_t* s, size_t len );
 
 /*! @breif		Peek data from queue buffer. */
 void queue_buffer_peek( queue_buffer_t const* s, void* b, size_t len );
+
+//! @breif      Do peeking and popping at once.
+static inline 
+void queue_buffer_draw( queue_buffer_t const* s, void* b, size_t len )
+{
+    queue_buffer_peek( s, b, len );
+    queue_buffer_pop( s, len );
+}
