@@ -52,14 +52,11 @@ void queue_allocator_pop( struct queue_allocator* s )
     // size_t initTailPos = s->tail;
     jmpSize = *( size_t*) ( s->buff + s->tail );
 
-    if ( jmpSize == 0 )
+    s->tail += jmpSize;
+
+    if ( *( size_t*) & s->buff[s->tail] == 0 )
     {
-        // Always points valid value.
-        s->tail = 0; 
-    }
-    else
-    {
-    	s->tail += jmpSize;
+        s->tail = 0;
     }
 
     --s->cnt;

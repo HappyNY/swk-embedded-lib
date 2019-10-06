@@ -23,12 +23,13 @@ static void gen_random( char* s, const int len ) {
 TEST_CASE( "Queue functionality test", "[Queue]" )
 {
     queue_allocator s;
-    size_t const cap = 300000;
+    size_t const cap = 150000;
     queue_allocator_init( &s, malloc( cap ), cap );
 
     std::vector<std::string> init;
     char buff[128];
 
+    size_t onCount = 0;
     for ( int lp = 0; lp < 128; ++lp )
     {
         init.clear();
@@ -46,11 +47,14 @@ TEST_CASE( "Queue functionality test", "[Queue]" )
 
         for ( auto& str : init )
         {
+            ++onCount;
+            
             size_t placeholder;
             auto a = ( char*) queue_allocator_peek( &s, &placeholder );
             auto b = str.data();
-            INFO( "A: " << a << "\n" );
-            INFO( "B: " << b << "\n" );
+            INFO("A: " << a << "\n");
+            INFO("B: " << b << "\n");
+            INFO("On count: " << onCount << "\n");
             INFO( s.cnt << " " << lp );
             REQUIRE( strcmp( a, b ) == 0 );
             queue_allocator_pop( &s );
