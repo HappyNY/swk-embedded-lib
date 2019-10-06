@@ -2,10 +2,11 @@ extern "C"
 {
 #include "uEmbedded/queue_allocator.h"
 #include "uEmbedded/event-procedure.h"
+#include "uEmbedded/queue_buffer.h"
 }
 #include <catch2/catch.hpp>
 #include <string>
-#include <vector>
+#include <vector> 
 
 static void gen_random( char* s, const int len ) {
     static const char alphanum[] =
@@ -63,4 +64,15 @@ TEST_CASE( "Queue functionality test", "[Queue]" )
 
     free( s.buff );
 } 
- 
+
+using namespace std;
+
+TEST_CASE( "Buffer test", "[queue_buffer]" )
+{
+    static char buff[0x10000];
+    queue_buffer_t v;
+
+    queue_buffer_init( &v, buff, sizeof( buff ) );
+
+    // @todo.
+}
