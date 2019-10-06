@@ -22,7 +22,7 @@ target_link_libraries(testcase PUBLIC uembedded_c)
 
 # Install settings
 # Install libraries
-install( 
+install(
 	TARGETS uembedded_c
 	RUNTIME DESTINATION ${DEST_DIR_NAME}/bin
 	LIBRARY DESTINATION ${DEST_DIR_NAME}/lib

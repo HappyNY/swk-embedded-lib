@@ -1,0 +1,23 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "intelliSenseMode": "msvc-x86",
+            "cppStandard": "c++14",
+            "cStandard": "c99",
+            "includePath": [
+                "E:/Windows Kits/10/Include/10.0.18362.0/ucrt",
+                "C:/Program Files (x86)/Microsoft Visual Studio/VS2019/VC/Tools/MSVC/14.22.27905/include",
+                "${workspaceFolder}/src",
+                "${workspaceFolder}/third/Catch2/single_include"
+            ]
+            
+        }
+    ],
+    "version": 4
+}

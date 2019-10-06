@@ -25,7 +25,7 @@ struct transceiver_vtable
 {
     //! \brief      This function must return control right away with any result.
     //! \details    If the connection is valid and there's nothing to read in the buffer or something, it should return zero to indicate that there's nothing to read.
-    transceiver_result_t( *status )( void* /*obj*/, char* /*rdbuf*/, size_t/*rdcnt*/ );
+    transceiver_result_t( *status )( void* /*obj*/ );
     
     //! \brief      If the connection is valid, this function must wait until the data receive.
     transceiver_result_t( *read )( void* /*obj*/, char* /*rdbuf*/, size_t/*rdcnt*/ );
@@ -52,15 +52,6 @@ typedef struct transceiver_vtable transceiver_vtable_t;
       Therefore, placing this base type at the mid of the other members can make the rest of the development process confusing.*/
 typedef struct transceiver_vtable* transceiver_vptr_t;
 
-//! \brief      Tries to read data from transciever. 
-//! \param      
-//! \returns Zero if buffer is empty. Otherwise positive return value indicates number of actual data read.
-static inline 
-transceiver_result_t td_status( transceiver_vptr_t td, char* buf, size_t rdcnt )
-{
-    return td->status( ( void*) td, buf, rdcnt );
-}
-
 //! \brief Read data from the transceiver. It blocks until reading all 'rdcnt' bytes of data.
 static inline
 transceiver_result_t td_read( transceiver_vptr_t td, char* buf, size_t rdcnt )
@@ -80,11 +71,4 @@ transceiver_result_t td_read( transceiver_vptr_t td, char* buf, size_t rdcnt )
         }
     }
     return read;
-}
-
-//! \brief Write data into tranceiver.
-static inline
-transceiver_result_t td_write( transceiver_vptr_t td, char const* buf, size_t wrcnt )
-{
-    return td->write( ( void*) td, buf, wrcnt );
-}
+} 
