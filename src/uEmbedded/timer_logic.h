@@ -71,11 +71,16 @@ bool timer_isActive( timer_logic_t* s, timer_handle_t h )
 
 //! \brief      Remove allcoated timer.
 static inline
-void timer_erase( timer_logic_t* s, timer_handle_t h )
+bool timer_erase( timer_logic_t* s, timer_handle_t h )
 {
     if ( timer_isActive( s, h ) )
     {
         fslist_erase( &s->nodes, h.n );
+        return true;
+    }
+    else
+    {
+        return false;
     }
 }
 
@@ -86,7 +91,7 @@ void timer_triggerFirst( timer_logic_t* s )
     struct fslist_node* head;
     timer_info_t* info;
     
-    uemb_assert( s->nodes.size > 0 );
+    uassert( s->nodes.size > 0 );
 
     head = &s->nodes.get[s->nodes.head];
     

@@ -37,8 +37,8 @@ timer_handle_t timer_add( timer_logic_t* s, size_t whenToTrigger, void( *callbac
     timer_handle_t ret;
 
     n = fslist_insert( &s->nodes, timer_find( s, whenToTrigger ) );
-    uemb_assert( n );
-    uemb_assert( callback );
+    uassert( n );
+    uassert( callback );
 
     info = ( timer_info_t*) fslist_data( &s->nodes, n );
     

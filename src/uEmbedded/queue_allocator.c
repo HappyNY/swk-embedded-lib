@@ -25,7 +25,7 @@ void* queue_allocator_push( struct queue_allocator* s, size_t size )
     }
     if ( s->cnt && s->head <= s->tail && s->head + jmpSize >= s->tail )
     {
-        uemb_assert( false );
+        uassert( false );
         return NULL;
     }
 
@@ -45,7 +45,7 @@ void queue_allocator_pop( struct queue_allocator* s )
 
     if ( s->cnt == 0 )
     {
-        uemb_assert( false );
+        uassert( false );
         return;
     }
 
@@ -64,7 +64,7 @@ void queue_allocator_pop( struct queue_allocator* s )
 
 void* queue_allocator_peek( struct queue_allocator* s, size_t* size )
 {
-    uemb_assert( s->cnt && size );
+    uassert( s->cnt && size );
     *size = *( size_t*) ( s->buff + s->tail ) - sizeof( size_t );
     return s->buff + s->tail + sizeof( size_t );
 }
