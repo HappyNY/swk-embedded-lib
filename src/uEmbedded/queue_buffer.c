@@ -6,7 +6,7 @@ void queue_buffer_init( queue_buffer_t* s, void* buff, size_t buffSz )
     s->buff = buff;
     s->cap = buffSz;
     s->head = 0;
-    s->tail = buffSz - 1;
+    s->tail = 0;
 }
 
 void queue_buffer_push( queue_buffer_t* s, void const* d, size_t len )
@@ -39,4 +39,12 @@ void queue_buffer_peek( queue_buffer_t const* s, void* b, size_t len )
     {
         ( ( char*) b )[i] = s->buff[t];
     }
+}
+
+size_t queue_buffer_size( queue_buffer_t const* s )
+{
+    if ( s->head >= s->tail )
+        return s->head - s->tail;
+    else
+        return s->cap - s->tail + s->head;
 }

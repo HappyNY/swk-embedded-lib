@@ -15,8 +15,8 @@
                 "C:/Program Files (x86)/Microsoft Visual Studio/VS2019/VC/Tools/MSVC/14.22.27905/include",
                 "${workspaceFolder}/src",
                 "${workspaceFolder}/third/Catch2/single_include"
-            ]
-            
+            ],
+            "configurationProvider": "vector-of-bool.cmake-tools"
         }
     ],
     "version": 4

@@ -30,22 +30,30 @@ struct queue_buffer
 typedef struct queue_buffer queue_buffer_t;
 
 
-/*! @breif		Initiate buffer */
+/*! \breif		Initiate buffer */
 void queue_buffer_init( queue_buffer_t* s, void* buff, size_t buffSz );
 
-/*! @breif		Push data into queue buffer */
+/*! \breif		Push data into queue buffer */
 void queue_buffer_push( queue_buffer_t* s, void const* d, size_t len );
 
-/*! @breif		Pop data from queue buffer. */
+/*! \breif		Pop data from queue buffer. */
 void queue_buffer_pop( queue_buffer_t* s, size_t len );
 
-/*! @breif		Peek data from queue buffer. */
+/*! \breif		Peek data from queue buffer. */
 void queue_buffer_peek( queue_buffer_t const* s, void* b, size_t len );
 
-//! @breif      Do peeking and popping at once.
+/*! \breif      Get current data cnt */
+size_t queue_buffer_size( queue_buffer_t const* s );
+
+/*! \breif      Do popping and peeking at once. 
+    \return     Number of byte actually read. */
 static inline 
-void queue_buffer_draw( queue_buffer_t const* s, void* b, size_t len )
+size_t queue_buffer_draw( queue_buffer_t* s, void* b, size_t len )
 {
+    size_t sz = queue_buffer_size( s ); 
+    if ( sz < len )
+        len = sz;
     queue_buffer_peek( s, b, len );
     queue_buffer_pop( s, len );
+    return len;
 }

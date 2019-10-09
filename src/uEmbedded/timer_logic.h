@@ -1,6 +1,7 @@
 #pragma once
 #include <stdlib.h>
 #include "fslist.h"
+#include "uemb_assert.h"
 
 struct timer_logic
 {
@@ -76,4 +77,23 @@ void timer_erase( timer_logic_t* s, timer_handle_t h )
     {
         fslist_erase( &s->nodes, h.n );
     }
+}
+
+//! \breif      Trigger first timer unconditionally.
+static inline 
+void timer_triggerFirst( timer_logic_t* s )
+{
+    struct fslist_node* head;
+    timer_info_t* info;
+    
+    uemb_assert( s->nodes.size > 0 );
+
+    head = &s->nodes.get[s->nodes.head];
+    
+    void ( *cb )( void* ) = info->callback;
+    void* obj = info->callbackObj;
+  
+    fslist_erase( &s->nodes, head );
+
+    cb( obj );
 }
