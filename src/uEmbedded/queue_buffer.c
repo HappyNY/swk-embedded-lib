@@ -1,5 +1,5 @@
 #include "queue_buffer.h"
-#include "uemb_assert.h"
+#include "uassert.h"
 
 void queue_buffer_init( queue_buffer_t* s, void* buff, size_t buffSz )
 {

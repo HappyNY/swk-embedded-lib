@@ -1,5 +1,5 @@
 #include "fslist.h"
-#include "uemb_assert.h"
+#include "uassert.h"
 
 typedef struct fslist_node node_t;
 

@@ -1,5 +1,5 @@
 #include "timer_logic.h"
-#include "uemb_assert.h"
+#include "uassert.h"
 
 size_t timer_init( timer_logic_t* s, void* buff, size_t buffSize )
 {
