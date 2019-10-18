@@ -53,7 +53,7 @@ size_t timer_nextTrigger( timer_logic_t* s )
 static inline
 timer_info_t const* timer_browse( timer_logic_t* s, timer_handle_t h )
 {
-    if ( h.n->isValid )
+    if ( h.n && h.n->isValid )
     {
         timer_info_t* info = ( timer_info_t*) fslist_data( &s->nodes, h.n );
         if ( info->timerId == h.timerId )

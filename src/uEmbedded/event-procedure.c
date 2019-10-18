@@ -45,10 +45,10 @@ void QueueEvent( struct EventQueue* queue, EventCallbackType callback, void cons
 void ProcessEvent( struct EventQueue* queue )
 {
     // Only a fixed number of events will be processed for each procedure call.
-    size_t fence = queue->queue.head;
+    size_t fence = queue->queue.cnt;
     size_t len;
 
-    while ( queue->queue.tail != fence )
+    while ( fence-- )
     {
         struct queueArg* arg = ( struct queueArg* )queue_allocator_peek( &queue->queue, &len );
 
