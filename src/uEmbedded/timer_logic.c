@@ -54,7 +54,7 @@ timer_handle_t timer_add( timer_logic_t* s, size_t whenToTrigger, void( *callbac
 
 void timer_update( timer_logic_t* s, size_t curTime )
 {
-    struct fslist_node* head, * tmp;
+    struct fslist_node* head;
     timer_info_t* info;
     void ( *cb )( void* );
     void* obj;
@@ -62,18 +62,20 @@ void timer_update( timer_logic_t* s, size_t curTime )
     if ( s->nodes.size == 0 )
         return;
 
-    for ( head = &s->nodes.get[s->nodes.head]
-          ; head && ( *( info = ( timer_info_t*) fslist_data( &s->nodes, head ) ) ).triggerTime <= curTime
-          ; )
+    for ( ; s->nodes.head != FSLIST_NODEIDX_NONE;)
     {
-        tmp = head;
-        head = fslist_next( &s->nodes, head );
+        head = &s->nodes.get[s->nodes.head];
+        info = ( timer_info_t*) fslist_data( &s->nodes, head );
+
+        // Timer update done.
+        if ( info->triggerTime > curTime )
+            break;
 
         cb = info->callback;
         obj = info->callbackObj;
 
-        fslist_erase( &s->nodes, tmp );
-
+        // Erase head node
+        fslist_erase( &s->nodes, head );
         cb( obj );
     }
 }
