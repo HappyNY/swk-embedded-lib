@@ -39,7 +39,8 @@ void QueueEvent( struct EventQueue* queue, EventCallbackType callback, void cons
     void* data = ( void*) ( arg + 1 );
 
     // Copy parameter data to buffer.
-    memcpy( data, callbackParam, paramSize );
+    if ( callbackParam && paramSize )
+        memcpy( data, callbackParam, paramSize );
 }
 
 void ProcessEvent( struct EventQueue* queue )
