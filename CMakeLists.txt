@@ -14,11 +14,20 @@ aux_source_directory(testcase TESTCASE)
 # Core library build.
 add_library(uembedded_c STATIC ${SRC_C}) 
 
-# Testcase build.
-include_directories("./third/Catch2/single_include/")
-add_executable(testcase ${TESTCASE})
-add_dependencies(testcase uembedded_c)
-target_link_libraries(testcase PUBLIC uembedded_c)
+# Testcase is only available on win32 devenv
+if(WIN32)
+        # Testcase build.
+        include_directories("./third/Catch2/single_include/")
+        add_executable(testcase ${TESTCASE})
+        add_dependencies(testcase uembedded_c)
+        target_link_libraries(testcase PUBLIC uembedded_c)
+        
+        # Install tests
+        install(
+	        TARGETS testcase
+	        RUNTIME DESTINATION ${DEST_DIR_NAME}/test
+        )
+endif()
 
 # Install settings
 # Install libraries
@@ -33,8 +42,3 @@ install(
 install( FILES "src/uEmbedded/*.h" DESTINATION ${DEST_DIR_NAME}/include ) 
 install( FILES "src/uEmbedded/*.hpp" DESTINATION ${DEST_DIR_NAME}/include ) 
 
-# Install tests
-install(
-	TARGETS testcase
-	RUNTIME DESTINATION ${DEST_DIR_NAME}/test
-)
