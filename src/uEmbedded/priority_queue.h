@@ -1,6 +1,7 @@
 #pragma once
 #include <stdbool.h>
 #include <stdint.h>
+#include <stdlib.h>
 #include "uassert.h"
 
 //! \breif      Priority queue struct. Based on minimum heap. 
