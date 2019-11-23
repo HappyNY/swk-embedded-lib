@@ -20,6 +20,11 @@ struct timer_logic_info
     void *callbackObj;
 };
 
+enum // Required to allocate buffer for size
+{
+    TIMER_ELEM_SIZE = FSLIST_NODE_SIZE + sizeof(struct timer_logic_info)
+};
+
 struct timer_handle
 {
     struct fslist_node *n;

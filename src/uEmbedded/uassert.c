@@ -1,8 +1,8 @@
 #include <assert.h>
 
-void uemb_assert_impl_default( char const* expr, char const* file, char const* function, int line )
+void uemb_assert_impl_default(char const *expr, char const *file, char const *function, int line)
 {
-    assert( 0 && expr );
+    assert(0 && expr);
 }
 
-void ( *uemb_assert_impl )( char const* expr, char const* file, char const* function, int line ) = uemb_assert_impl_default;
+void (*uemb_assert_impl)(char const *expr, char const *file, char const *function, int line) = uemb_assert_impl_default;
