@@ -4,7 +4,7 @@
 
 size_t lowerbound(void const *arr, void const *eval, size_t elemSize, size_t numElems, int (*pred)(void const *, void const *))
 {
-    uassert(arr && eval && pred && elemSize && numElems);
+    uassert(arr && eval && pred && elemSize);
 
     size_t up = numElems, dn = 0;
     size_t idx = numElems >> 1;
@@ -39,7 +39,7 @@ size_t lowerbound(void const *arr, void const *eval, size_t elemSize, size_t num
 void *array_insert(void const *arr, void const *elem, size_t index, size_t elemSize, size_t *lpNumElems)
 {
     size_t numElems = *lpNumElems;
-    uassert(arr && elemSize && numElems && index > 0);
+    uassert(arr && elemSize && index <= numElems);
 
     void *ptr = (char *)arr + index * elemSize;
     char *begin = (char *)arr + (numElems + 1) * elemSize - 1;
