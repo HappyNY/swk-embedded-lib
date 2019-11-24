@@ -4,8 +4,12 @@
 #include <stdlib.h>
 #include "assert.h"
 
+#ifndef FSLIST_INDEX_TYPE
+#define FSLIST_INDEX_TYPE uint32_t
+#endif
+
 //! \brief      16bit unsigned integer wil be used to indicate list node index. Therefore only 65535 nodes can be allocated for single list.
-typedef uint16_t fslist_idx_t;
+typedef FSLIST_INDEX_TYPE fslist_idx_t;
 
 //! \breif      Constant value that indicates invaid node index
 enum
@@ -102,7 +106,8 @@ static inline struct fslist_node *fslist_prev(struct fslist *s, struct fslist_no
     \warning    This function is deprecated. */
 static inline void *fslist_data(struct fslist *s, struct fslist_node const *n)
 {
-    return (void *)(s->data + (fslist_idx(s, n) * s->elemSize));
+    fslist_idx_t idx = fslist_idx(s, n);
+    return idx != FSLIST_NODEIDX_NONE ? (void *)(s->data + (idx * s->elemSize)) : NULL;
 }
 
 /*! \brief      Apply same process to all active nodes iteratively. */

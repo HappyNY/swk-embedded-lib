@@ -7,10 +7,13 @@
                 "UNICODE",
                 "_UNICODE"
             ],
-            "intelliSenseMode": "msvc-x86",
+            "intelliSenseMode": "clang-x86",
             "cppStandard": "c++14",
             "cStandard": "c99",
             "includePath": [
+                "C:/Links/includes",
+                "C:/Links/includes/linux",
+                "C:/Links/includes/gcc",
                 "E:/Windows Kits/10/Include/10.0.18362.0/ucrt",
                 "C:/Program Files (x86)/Microsoft Visual Studio/VS2019/VC/Tools/MSVC/14.22.27905/include",
                 "${workspaceFolder}/src",
