@@ -42,12 +42,14 @@ void *array_insert(void const *arr, void const *elem, size_t index, size_t elemS
     uassert(arr && elemSize && index <= numElems);
 
     void *ptr = (char *)arr + index * elemSize;
-    char *begin = (char *)arr + (numElems + 1) * elemSize - 1;
-    char *end = (char *)ptr + elemSize - 1;
+    char *begin = (char *)arr + numElems * elemSize;
 
     // Copy memories from back ... means shift operation of elements
-    while (begin != end)
-        *begin-- = *(begin - elemSize);
+    while (begin != ptr)
+    {
+        memcpy(begin, begin - elemSize, elemSize);
+        begin -= elemSize;
+    }
 
     if (elem)
         memcpy(ptr, elem, elemSize);
