@@ -20,6 +20,7 @@ enum
 
 typedef struct objhandle
 {
+    managed_object_pool_t *s;
     struct fslist_node const *node;
     uint32_t id;
 } objhandle_t;
@@ -33,6 +34,10 @@ typedef struct managed_object_pool
 
 void objpool_init(managed_object_pool_t *s, size_t numMaxRef);
 objhandle_t objpool_malloc(managed_object_pool_t *s, size_t memsize);
-bool objpool_free(managed_object_pool_t *s, objhandle_t h);
-void *objpool_lock(managed_object_pool_t *s, objhandle_t h);
-void objpool_unlock(managed_object_pool_t *s, objhandle_t h);
+
+typedef void (*objpool_foreach_callback_t)(void *caller, void *object);
+void objpool_foreach(managed_object_pool_t *s, void *caller, objpool_foreach_callback_t cb);
+
+bool obj_free(objhandle_t const *h);
+void *obj_lock(objhandle_t const *h);
+void obj_unlock(objhandle_t const *h);

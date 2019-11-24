@@ -10,12 +10,12 @@ typedef struct objnode
     bool pending_free;
 } objnode_t;
 
-void *objpool_lock(managed_object_pool_t *s, objhandle_t h)
+void *obj_lock(objhandle_t const *h)
 {
-    uassert(s && h.id != OBJECTID_NULL);
-    objnode_t *data = fslist_data(&s->refpool, h.node);
+    uassert(h->s && h->id != OBJECTID_NULL);
+    objnode_t *data = fslist_data(&h->s->refpool, h->node);
 
-    if (data && data->id == h.id && data->pending_free == false)
+    if (data && data->id == h->id && data->pending_free == false)
     {
         uassert(data->ref);
         ++data->lockcnt;
@@ -27,12 +27,12 @@ void *objpool_lock(managed_object_pool_t *s, objhandle_t h)
     }
 }
 
-void objpool_unlock(managed_object_pool_t *s, objhandle_t h)
+void obj_unlock(objhandle_t const *h)
 {
-    uassert(s && h.id != OBJECTID_NULL);
-    objnode_t *data = fslist_data(&s->refpool, h.node);
+    uassert(h->s && h->id != OBJECTID_NULL);
+    objnode_t *data = fslist_data(&h->s->refpool, h->node);
 
-    if (data && data->id == h.id)
+    if (data && data->id == h->id)
     {
         uassert(data->lockcnt > 0);
         --data->lockcnt;
@@ -43,17 +43,17 @@ void objpool_unlock(managed_object_pool_t *s, objhandle_t h)
             uassert(data->ref);
             free(data->ref);
             data->id = OBJECTID_NULL;
-            fslist_erase(s, &h.node);
+            fslist_erase(h->s, &h->node);
         }
     }
 }
 
-bool objpool_free(managed_object_pool_t *s, objhandle_t h)
+bool obj_free(objhandle_t const *h)
 {
-    uassert(s && h.id != OBJECTID_NULL);
-    objnode_t *data = fslist_data(&s->refpool, h.node);
+    uassert(h->s && h->id != OBJECTID_NULL);
+    objnode_t *data = fslist_data(&h->s->refpool, h->node);
 
-    if (data && data->id == h.id)
+    if (data && data->id == h->id)
     {
         if (data->lockcnt)
         {
@@ -64,7 +64,7 @@ bool objpool_free(managed_object_pool_t *s, objhandle_t h)
         // Erase node
         free(data->ref);
         data->id = OBJECTID_NULL;
-        fslist_erase(s, &h.node);
+        fslist_erase(h->s, &h->node);
         return true;
     }
     else
