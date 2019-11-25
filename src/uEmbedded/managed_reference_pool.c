@@ -13,6 +13,7 @@ typedef struct refnode
 struct managed_reference_pool
 {
     /*data*/
+    struct managed_reference_pool* ref_to_myself;
     uint32_t idgen;
     struct fslist refs;
 };
@@ -29,7 +30,7 @@ managed_reference_pool_t* refpool_create(size_t numMaxRef)
     fslist_init(&s->refs, malloc(buffSz), buffSz, sizeof(refnode_t));
 
     uassert(s->refs.capacity == numMaxRef);
-
+    s->ref_to_myself = s;
     return s;
 }
 
@@ -56,6 +57,23 @@ refhandle_t refpool_malloc(managed_reference_pool_t *s, size_t memsize)
 size_t refpool_num_available(managed_reference_pool_t* s)
 {
     return s->refs.capacity - s->refs.size;
+}
+
+static void release_all(void* nouse_, refhandle_t* h)
+{
+    free(ref_lock(h));
+}
+
+void refpool_destroy(managed_reference_pool_t* s)
+{
+    // Release all memory
+    refpool_foreach(s, NULL, release_all);
+
+    // Releaes ref to myself
+    s->ref_to_myself = NULL;
+
+    // Erase ref to myself
+    free(s);
 }
 
 void refpool_foreach(managed_reference_pool_t *s, void *caller, refpool_foreach_callback_t cb)
@@ -98,7 +116,13 @@ void refpool_foreach(managed_reference_pool_t *s, void *caller, refpool_foreach_
 void *ref_lock(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
-    refnode_t *data = fslist_data(&h->s->refs, h->node);
+
+    // Check if reference is alive.
+    managed_reference_pool_t* s = *h->s;
+    if ( s == NULL )
+        return NULL;
+
+    refnode_t *data = fslist_data(&s->refs, h->node);
 
     if (data && data->id == h->id && data->pending_free == false)
     {
@@ -115,7 +139,13 @@ void *ref_lock(refhandle_t const *h)
 void ref_unlock(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
-    refnode_t *data = fslist_data(&h->s->refs, h->node);
+
+    // Check if reference is alive.
+    managed_reference_pool_t* s = *h->s;
+    if ( s == NULL )
+        return NULL;
+
+    refnode_t *data = fslist_data(&s->refs, h->node);
 
     if (data && data->id == h->id)
     {
@@ -128,7 +158,7 @@ void ref_unlock(refhandle_t const *h)
             uassert(data->ref);
             free(data->ref);
             data->id = OBJECTID_NULL;
-            fslist_erase(&h->s->refs, h->node);
+            fslist_erase(&s->refs, h->node);
         }
     }
 }
@@ -136,7 +166,13 @@ void ref_unlock(refhandle_t const *h)
 bool ref_free(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
-    refnode_t *data = fslist_data(&h->s->refs, h->node);
+
+    // Check if reference is alive.
+    managed_reference_pool_t* s = *h->s;
+    if ( s == NULL )
+        return NULL;
+
+    refnode_t *data = fslist_data(&s->refs, h->node);
 
     if (data && data->id == h->id)
     {
@@ -149,7 +185,7 @@ bool ref_free(refhandle_t const *h)
         // Erase node
         free(data->ref);
         data->id = OBJECTID_NULL;
-        fslist_erase(&h->s->refs, h->node);
+        fslist_erase(&s->refs, h->node);
         return true;
     }
     else
@@ -160,7 +196,12 @@ bool ref_free(refhandle_t const *h)
 
 bool ref_is_valid(refhandle_t const* h)
 {
-    refnode_t* data = fslist_data(&h->s->refs, h->node);
+    // Check if reference is alive.
+    managed_reference_pool_t* s = *h->s;
+    if ( s == NULL )
+        return false;
+
+    refnode_t* data = fslist_data(&s->refs, h->node);
 
     if ( data && data->id == h->id && data->pending_free == false )
     {

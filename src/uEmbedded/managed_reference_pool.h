@@ -20,7 +20,7 @@ enum
 
 typedef struct refhandle
 {
-    struct managed_reference_pool* s;
+    struct managed_reference_pool** s;
     struct fslist_node const* node;
     uint32_t id;
 } refhandle_t;
@@ -30,6 +30,9 @@ typedef struct managed_reference_pool managed_reference_pool_t;
 managed_reference_pool_t* refpool_create(size_t numMaxRef);
 refhandle_t refpool_malloc(managed_reference_pool_t *s, size_t memsize);
 size_t refpool_num_available(managed_reference_pool_t* s);
+
+//! \warning    This function invalidates all alive reference handles!
+void refpool_destroy(managed_reference_pool_t* s);
 
 typedef void (*refpool_foreach_callback_t)(void */*caller*/, refhandle_t const */*iter_object*/);
 void refpool_foreach(managed_reference_pool_t *s, void *caller, refpool_foreach_callback_t cb);

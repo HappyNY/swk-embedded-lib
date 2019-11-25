@@ -45,4 +45,6 @@ TEST_CASE("refpool test", "[managed_reference_pool]")
     }
 
     REQUIRE(refpool_num_available(p));
+
+    refpool_destroy(p);
 }

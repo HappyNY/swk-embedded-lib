@@ -38,5 +38,5 @@ TEST_CASE("delegate test", "[delegate_pool]")
 
     REQUIRE(v == 15);
 
-    
+    delegate_destroy(evnt);
 }
