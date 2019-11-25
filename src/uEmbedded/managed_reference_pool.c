@@ -1,42 +1,42 @@
-#include "managed_object_pool.h"
+#include "managed_reference_pool.h"
 #include "uassert.h"
 #include <stdio.h>
 
-typedef struct objnode
+typedef struct refnode
 {
     void *ref;
     uint32_t id;
     int16_t lockcnt;
     bool pending_free;
-} objnode_t;
+} refnode_t;
 
-struct managed_object_pool
+struct managed_reference_pool
 {
     /*data*/
     uint32_t idgen;
     struct fslist refs;
 };
 
-managed_object_pool_t* objpool_init(size_t numMaxRef)
+managed_reference_pool* objpool_init(size_t numMaxRef)
 {
-    managed_object_pool_t* s;
+    managed_reference_pool* s;
     uassert(s);
-    size_t buffSz = numMaxRef * (FSLIST_NODE_SIZE + sizeof(objnode_t));
+    size_t buffSz = numMaxRef * (FSLIST_NODE_SIZE + sizeof(refnode_t));
 
     s->idgen = 0;
-    fslist_init(&s->refs, malloc(buffSz), buffSz, sizeof(objnode_t));
+    fslist_init(&s->refs, malloc(buffSz), buffSz, sizeof(refnode_t));
 
     uassert(&s->refs.capacity == numMaxRef);
 
     return s;
 }
 
-objhandle_t objpool_malloc(managed_object_pool_t *s, size_t memsize)
+refhandle_t objpool_malloc(managed_reference_pool *s, size_t memsize)
 {
     uassert(s && s->refs.size < s->refs.capacity);
 
     struct fslist_node *n = fslist_insert(&s->refs, NULL);
-    objnode_t *data = fslist_data(&s->refs, n);
+    refnode_t *data = fslist_data(&s->refs, n);
     uassert(n && data);
 
     data->id = s->idgen++;
@@ -44,14 +44,14 @@ objhandle_t objpool_malloc(managed_object_pool_t *s, size_t memsize)
     data->ref = malloc(memsize);
     data->lockcnt = 0;
 
-    objhandle_t ret;
+    refhandle_t ret;
     ret.id = data->id;
     ret.node = n;
     ret.s = s;
     return ret;
 }
 
-void objpool_foreach(managed_object_pool_t *s, void *caller, objpool_foreach_callback_t cb)
+void objpool_foreach(managed_reference_pool *s, void *caller, objpool_foreach_callback_t cb)
 {
     uassert(s && cb);
 
@@ -60,8 +60,8 @@ void objpool_foreach(managed_object_pool_t *s, void *caller, objpool_foreach_cal
 
     // First node ref
     struct fslist_node* n = &s->refs.get[s->refs.head]; 
-    objnode_t* objref;
-    objhandle_t h;
+    refnode_t* objref;
+    refhandle_t h;
     h.s = s;
 
     while ( n )
@@ -88,10 +88,10 @@ void objpool_foreach(managed_object_pool_t *s, void *caller, objpool_foreach_cal
     }
 }
 
-void *obj_lock(objhandle_t const *h)
+void *obj_lock(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
-    objnode_t *data = fslist_data(&h->s->refs, h->node);
+    refnode_t *data = fslist_data(&h->s->refs, h->node);
 
     if (data && data->id == h->id && data->pending_free == false)
     {
@@ -105,10 +105,10 @@ void *obj_lock(objhandle_t const *h)
     }
 }
 
-void obj_unlock(objhandle_t const *h)
+void obj_unlock(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
-    objnode_t *data = fslist_data(&h->s->refs, h->node);
+    refnode_t *data = fslist_data(&h->s->refs, h->node);
 
     if (data && data->id == h->id)
     {
@@ -126,10 +126,10 @@ void obj_unlock(objhandle_t const *h)
     }
 }
 
-bool obj_free(objhandle_t const *h)
+bool obj_free(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
-    objnode_t *data = fslist_data(&h->s->refs, h->node);
+    refnode_t *data = fslist_data(&h->s->refs, h->node);
 
     if (data && data->id == h->id)
     {
@@ -151,9 +151,9 @@ bool obj_free(objhandle_t const *h)
     }
 }
 
-bool obj_is_valid(objhandle_t const* h)
+bool obj_is_valid(refhandle_t const* h)
 {
-    objnode_t* data = fslist_data(&h->s->refs, h->node);
+    refnode_t* data = fslist_data(&h->s->refs, h->node);
 
     if ( data && data->id == h->id && data->pending_free == false )
     {
