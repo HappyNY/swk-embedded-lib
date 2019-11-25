@@ -17,7 +17,7 @@ struct managed_reference_pool
     struct fslist refs;
 };
 
-managed_reference_pool_t* refpool_init(size_t numMaxRef)
+managed_reference_pool_t* refpool_create(size_t numMaxRef)
 {
     managed_reference_pool_t* s = malloc(sizeof(managed_reference_pool_t));
     if ( s == NULL )

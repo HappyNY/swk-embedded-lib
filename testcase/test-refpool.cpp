@@ -8,7 +8,7 @@ TEST_CASE("refpool test", "[managed_reference_pool]")
 {
     managed_reference_pool_t* p;
     enum { NUM_MAX_REF = 10000 };
-    p = refpool_init(NUM_MAX_REF);
+    p = refpool_create(NUM_MAX_REF);
 
     refhandle_t hd[NUM_MAX_REF];
 

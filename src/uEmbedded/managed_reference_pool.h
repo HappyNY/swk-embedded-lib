@@ -27,7 +27,7 @@ typedef struct refhandle
 
 typedef struct managed_reference_pool managed_reference_pool_t;
 
-managed_reference_pool_t* refpool_init(size_t numMaxRef);
+managed_reference_pool_t* refpool_create(size_t numMaxRef);
 refhandle_t refpool_malloc(managed_reference_pool_t *s, size_t memsize);
 size_t refpool_num_available(managed_reference_pool_t* s);
 
