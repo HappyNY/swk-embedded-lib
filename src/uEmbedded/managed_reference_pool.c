@@ -17,21 +17,23 @@ struct managed_reference_pool
     struct fslist refs;
 };
 
-managed_reference_pool* objpool_init(size_t numMaxRef)
+managed_reference_pool_t* refpool_init(size_t numMaxRef)
 {
-    managed_reference_pool* s;
-    uassert(s);
+    managed_reference_pool_t* s = malloc(sizeof(managed_reference_pool_t));
+    if ( s == NULL )
+        return NULL;
+
     size_t buffSz = numMaxRef * (FSLIST_NODE_SIZE + sizeof(refnode_t));
 
     s->idgen = 0;
     fslist_init(&s->refs, malloc(buffSz), buffSz, sizeof(refnode_t));
 
-    uassert(&s->refs.capacity == numMaxRef);
+    uassert(s->refs.capacity == numMaxRef);
 
     return s;
 }
 
-refhandle_t objpool_malloc(managed_reference_pool *s, size_t memsize)
+refhandle_t refpool_malloc(managed_reference_pool_t *s, size_t memsize)
 {
     uassert(s && s->refs.size < s->refs.capacity);
 
@@ -51,7 +53,12 @@ refhandle_t objpool_malloc(managed_reference_pool *s, size_t memsize)
     return ret;
 }
 
-void objpool_foreach(managed_reference_pool *s, void *caller, objpool_foreach_callback_t cb)
+size_t refpool_num_available(managed_reference_pool_t* s)
+{
+    return s->refs.capacity - s->refs.size;
+}
+
+void refpool_foreach(managed_reference_pool_t *s, void *caller, refpool_foreach_callback_t cb)
 {
     uassert(s && cb);
 
@@ -73,13 +80,13 @@ void objpool_foreach(managed_reference_pool *s, void *caller, objpool_foreach_ca
         h.id = objref->id;
 
         // Lock node to prevent iteration breakdown
-        if ( obj_lock(&h) )
+        if ( ref_lock(&h) )
         {
             // Callback.
             cb(caller, &h);
 
             n = fslist_next(&s->refs, n);
-            obj_unlock(&h);
+            ref_unlock(&h);
         }
         else
         {
@@ -88,7 +95,7 @@ void objpool_foreach(managed_reference_pool *s, void *caller, objpool_foreach_ca
     }
 }
 
-void *obj_lock(refhandle_t const *h)
+void *ref_lock(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
     refnode_t *data = fslist_data(&h->s->refs, h->node);
@@ -105,7 +112,7 @@ void *obj_lock(refhandle_t const *h)
     }
 }
 
-void obj_unlock(refhandle_t const *h)
+void ref_unlock(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
     refnode_t *data = fslist_data(&h->s->refs, h->node);
@@ -121,12 +128,12 @@ void obj_unlock(refhandle_t const *h)
             uassert(data->ref);
             free(data->ref);
             data->id = OBJECTID_NULL;
-            fslist_erase(h->s, &h->node);
+            fslist_erase(&h->s->refs, h->node);
         }
     }
 }
 
-bool obj_free(refhandle_t const *h)
+bool ref_free(refhandle_t const *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
     refnode_t *data = fslist_data(&h->s->refs, h->node);
@@ -142,7 +149,7 @@ bool obj_free(refhandle_t const *h)
         // Erase node
         free(data->ref);
         data->id = OBJECTID_NULL;
-        fslist_erase(h->s, &h->node);
+        fslist_erase(&h->s->refs, h->node);
         return true;
     }
     else
@@ -151,7 +158,7 @@ bool obj_free(refhandle_t const *h)
     }
 }
 
-bool obj_is_valid(refhandle_t const* h)
+bool ref_is_valid(refhandle_t const* h)
 {
     refnode_t* data = fslist_data(&h->s->refs, h->node);
 

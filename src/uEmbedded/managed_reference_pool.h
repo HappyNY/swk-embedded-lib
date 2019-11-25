@@ -1,5 +1,5 @@
 /*! \brief
-    \file managed_reference_pool.h
+    \file managed_reference_pool_t.h
     \author Seungwoo Kang (ki6080@gmail.com)
     \version 0.1
     \date 2019-11-24
@@ -20,20 +20,21 @@ enum
 
 typedef struct refhandle
 {
-    managed_reference_pool *s;
-    struct fslist_node const *node;
+    struct managed_reference_pool* s;
+    struct fslist_node const* node;
     uint32_t id;
 } refhandle_t;
 
-typedef struct managed_reference_pool managed_reference_pool;
+typedef struct managed_reference_pool managed_reference_pool_t;
 
-managed_reference_pool* objpool_init(size_t numMaxRef);
-refhandle_t objpool_malloc(managed_reference_pool *s, size_t memsize);
+managed_reference_pool_t* refpool_init(size_t numMaxRef);
+refhandle_t refpool_malloc(managed_reference_pool_t *s, size_t memsize);
+size_t refpool_num_available(managed_reference_pool_t* s);
 
-typedef void (*objpool_foreach_callback_t)(void *caller, refhandle_t const *iter_object);
-void objpool_foreach(managed_reference_pool *s, void *caller, objpool_foreach_callback_t cb);
+typedef void (*refpool_foreach_callback_t)(void */*caller*/, refhandle_t const */*iter_object*/);
+void refpool_foreach(managed_reference_pool_t *s, void *caller, refpool_foreach_callback_t cb);
 
-bool obj_free(refhandle_t const *h);
-void *obj_lock(refhandle_t const *h);
-void obj_unlock(refhandle_t const *h);
-bool obj_is_valid(refhandle_t const* h);
+bool ref_free(refhandle_t const *h);
+void *ref_lock(refhandle_t const *h);
+void ref_unlock(refhandle_t const *h);
+bool ref_is_valid(refhandle_t const* h);
