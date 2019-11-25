@@ -25,19 +25,15 @@ typedef struct objhandle
     uint32_t id;
 } objhandle_t;
 
-typedef struct managed_object_pool
-{
-    /*data*/
-    uint32_t idgen;
-    struct fslist refpool;
-} managed_object_pool_t;
+typedef struct managed_object_pool managed_object_pool_t;
 
-void objpool_init(managed_object_pool_t *s, size_t numMaxRef);
+managed_object_pool_t* objpool_init(size_t numMaxRef);
 objhandle_t objpool_malloc(managed_object_pool_t *s, size_t memsize);
 
-typedef void (*objpool_foreach_callback_t)(void *caller, void *object);
+typedef void (*objpool_foreach_callback_t)(void *caller, objhandle_t const *iter_object);
 void objpool_foreach(managed_object_pool_t *s, void *caller, objpool_foreach_callback_t cb);
 
 bool obj_free(objhandle_t const *h);
 void *obj_lock(objhandle_t const *h);
 void obj_unlock(objhandle_t const *h);
+bool obj_is_valid(objhandle_t const* h);
