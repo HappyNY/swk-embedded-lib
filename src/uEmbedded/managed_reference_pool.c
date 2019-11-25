@@ -73,6 +73,7 @@ void refpool_destroy(managed_reference_pool_t* s)
     s->ref_to_myself = NULL;
 
     // Erase ref to myself
+    free(s->refs.buff);
     free(s);
 }
 
