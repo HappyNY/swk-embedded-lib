@@ -37,25 +37,22 @@ void pqueue_push(struct priority_queue *s, void const *elem)
     size_t idx = s->cnt;
     memcpy(get_at(s, idx), elem, s->elemSize);
 
-    if (idx)
+    char *a, *b;
+
+    for (; idx;)
     {
-        char *a, *b;
+        size_t up = (idx - 1) >> 1;
+        a = get_at(s, up);
+        b = get_at(s, idx);
 
-        for (;;)
-        {
-            size_t up = (idx - 1) >> 1;
-            a = get_at(s, up);
-            b = get_at(s, idx);
+        // Escape condition. If parent node is smaller than or equal with current ...
+        if (s->pred(a, b) <= 0)
+            break;
 
-            // Escape condition. If parent node is smaller than or equal with current ...
-            if (s->pred(a, b) <= 0)
-                break;
+        // Swap memory one by one
+        memswap(a, b, s->elemSize);
 
-            // Swap memory one by one
-            memswap(a, b, s->elemSize);
-
-            idx = up;
-        }
+        idx = up;
     }
 
     s->cnt++;
