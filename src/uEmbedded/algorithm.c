@@ -12,7 +12,7 @@ size_t lowerbound(void const *arr, void const *eval, size_t elemSize, size_t num
 
 #define at(idx) ((char *)arr + ((idx)*elemSize))
 
-    for (; idx;)
+    do
     {
         ccomp = pred(eval, at(idx));
         lcomp = pred(eval, at(idx - 1));
@@ -31,7 +31,7 @@ size_t lowerbound(void const *arr, void const *eval, size_t elemSize, size_t num
             break;
 
         idx = (dn + up) >> 1;
-    }
+    } while (idx);
 
     return idx;
 }
