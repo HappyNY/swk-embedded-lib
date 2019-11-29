@@ -45,10 +45,9 @@ void *array_insert(void const *arr, void const *elem, size_t index, size_t elemS
     char *begin = (char *)arr + numElems * elemSize;
 
     // Copy memories from back ... means shift operation of elements
-    while (begin != ptr)
+    while (begin-- != ptr)
     {
-        memcpy(begin, begin - elemSize, elemSize);
-        begin -= elemSize;
+        *begin = *(begin - elemSize);
     }
 
     if (elem)
