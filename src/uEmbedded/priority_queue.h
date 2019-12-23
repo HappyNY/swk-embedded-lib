@@ -37,7 +37,7 @@ void pqueue_push( struct priority_queue* s, void const* elem );
 void pqueue_pop( struct priority_queue* s );
 
 /*! \breif      Peak next element.  */
-static inline void* pqueue_peak(struct priority_queue* s)
+static inline void* pqueue_peek(struct priority_queue* s)
 {
     uassert(s && s->cnt);
     return s->buff;
