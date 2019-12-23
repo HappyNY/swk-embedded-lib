@@ -19,7 +19,7 @@ TEST_CASE("Test lowerbound", "[algorithm]")
     v.reserve(numElem);
 
     for ( int i = 0; i < numElem; ++i )
-    {
+    { 
         v.push_back(db(mt));
     }
 
@@ -27,7 +27,7 @@ TEST_CASE("Test lowerbound", "[algorithm]")
 
     for ( int i = 0; i < numElem; ++i )
     {
-        double val = db(mt);
+        double val = db(mt); 
         auto org = std::lower_bound(v.begin(), v.end(), val) - v.begin();
         auto idx = lowerbound(v.data(), &val, sizeof(double), numElem,
                               [] (auto a, auto b) -> int { auto v = *( double*) a - *( double*) b; return v < 0 ? -1 : v > 0 ? 1 : 0; }
