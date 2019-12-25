@@ -43,4 +43,4 @@ void QueueEvent( struct EventQueue* queue, EventCallbackType callback, void cons
 /*! \brief Process event.
     \details
         This function should be called periodically to process queued events while performing program. To not block whole program control infinitely, a fence object will be set, then it lets the procedure execute only a fixed number of requests. */
-void ProcessEvent( struct EventQueue* queue ); 
+void ProcessEvent(struct EventQueue *queue, void (*lock)(void *), void (*unlock)(void *), void *lockobj);

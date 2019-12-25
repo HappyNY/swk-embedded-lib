@@ -43,7 +43,8 @@ size_t timer_init(timer_logic_t *s, void *buff, size_t buffSize);
 timer_handle_t timer_add(timer_logic_t *s, size_t whenToTrigger, void (*callback)(void *), void *callbackObj);
 
 //! \brief      Update timer based on given time parameter.
-void timer_update(timer_logic_t *s, size_t curTime);
+/// @returns    Next trigger time. -1 if there's no more timer to trigger.
+size_t timer_update(timer_logic_t *s, size_t curTime);
 
 //! \brief      Get closest timer's trigger time
 static inline size_t timer_nextTrigger(timer_logic_t *s)

@@ -57,7 +57,7 @@ void queue_allocator_pop(struct queue_allocator *s)
     --s->cnt;
 
     if (s->cnt == 0)
-        s->head = s->tail;
+        s->head = s->tail = 0;
 }
 
 void *queue_allocator_peek(struct queue_allocator *s, size_t *size)
