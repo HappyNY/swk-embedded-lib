@@ -5,7 +5,7 @@
 #include "assert.h"
 
 #ifndef FSLIST_INDEX_TYPE
-#define FSLIST_INDEX_TYPE uint32_t
+#define FSLIST_INDEX_TYPE uint16_t
 #endif
 
 //! \brief      16bit unsigned integer wil be used to indicate list node index. Therefore only 65535 nodes can be allocated for single list.
