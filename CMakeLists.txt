@@ -4,6 +4,7 @@ project(uembedded_c)
 
 set(DEST_DIR_NAME "uembedded_c") 
 set(SRC_C_INC_DIR "src")
+set(SRC_CPP_INC_DIR "cppsrc")
 
 include_directories(${SRC_C_INC_DIR})
 include_directories(${SRC_CPP_INC_DIR})
@@ -42,3 +43,6 @@ install(
 install( FILES "src/uEmbedded/*.h" DESTINATION ${DEST_DIR_NAME}/include ) 
 install( FILES "src/uEmbedded/*.hpp" DESTINATION ${DEST_DIR_NAME}/include ) 
 
+# Cpp library
+file(GLOB_RECURSE SRC_CPP "cppsrc/*.cpp")
+add_library(uembedded_cpp STATIC ${SRC_CPP})
