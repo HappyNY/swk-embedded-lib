@@ -3,9 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
-
-//! \todo. Verify functionalities.
-
+ 
 #pragma pack(push, 4)
 struct queueArg {
     EventCallbackType func;
