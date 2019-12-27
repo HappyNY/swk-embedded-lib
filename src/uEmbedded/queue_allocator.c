@@ -2,7 +2,8 @@
 #include "uassert.h"
 #include <stdbool.h>
 
-void queue_allocator_init(struct queue_allocator *s, void *buff, size_t capacity)
+void queue_allocator_init(struct queue_allocator *s, void *buff,
+                          size_t capacity)
 {
     capacity = (capacity + sizeof(size_t) - 1) & ~(sizeof(size_t) - 1);
     s->buff  = (char *)buff;
@@ -15,7 +16,8 @@ void queue_allocator_init(struct queue_allocator *s, void *buff, size_t capacity
 void *queue_allocator_push(struct queue_allocator *s, size_t size)
 {
     // Memory is on 4-byte alignment.
-    size_t jmpSize = sizeof(size_t) + ((size + (sizeof(size_t) - 1)) & ~(sizeof(size_t) - 1));
+    size_t jmpSize = sizeof(size_t) +
+                     ((size + (sizeof(size_t) - 1)) & ~(sizeof(size_t) - 1));
 
     if (s->head + jmpSize + sizeof(size_t) >= s->cap) {
         // Notifies the position to go back.
@@ -27,7 +29,8 @@ void *queue_allocator_push(struct queue_allocator *s, size_t size)
         return NULL;
     }
 
-    // The first sizeof(size_t) byte of allocated memory indicates next memory block location.
+    // The first sizeof(size_t) byte of allocated memory indicates next memory
+    // block location.
     void *ret                      = s->buff + s->head + sizeof(size_t);
     *(size_t *)(s->buff + s->head) = jmpSize;
 

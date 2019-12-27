@@ -3,8 +3,9 @@
 
 size_t timer_init(timer_logic_t *s, void *buff, size_t buffSize)
 {
-    size_t retval = fslist_init(&s->nodes, buff, buffSize, sizeof(timer_info_t));
-    s->idGen      = 0;
+    size_t retval =
+        fslist_init(&s->nodes, buff, buffSize, sizeof(timer_info_t));
+    s->idGen = 0;
     return retval;
 }
 
@@ -28,7 +29,8 @@ static inline struct fslist_node *timer_find(timer_logic_t *s, size_t tick)
     return NULL;
 }
 
-timer_handle_t timer_add(timer_logic_t *s, size_t whenToTrigger, void (*callback)(void *), void *callbackObj)
+timer_handle_t timer_add(timer_logic_t *s, size_t        whenToTrigger,
+                         void (*callback)(void *), void *callbackObj)
 {
     struct fslist_node *n;
     timer_info_t *      info;
@@ -55,7 +57,7 @@ size_t timer_update(timer_logic_t *s, size_t curTime)
     struct fslist_node *head;
     timer_info_t *      info;
     void (*cb)(void *);
-    void * obj; 
+    void *obj;
 
     if (s->nodes.size == 0)
         return (size_t)-1;
