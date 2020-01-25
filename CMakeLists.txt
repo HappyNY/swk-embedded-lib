@@ -9,8 +9,8 @@ set(SRC_CPP_INC_DIR "cppsrc")
 include_directories(${SRC_C_INC_DIR})
 include_directories(${SRC_CPP_INC_DIR})
 
-aux_source_directory("src/uEmbedded" SRC_C) 
-aux_source_directory("src/uEmbedded-pp" SRC_C) 
+aux_source_directory("src/uEmbedded" SRC_C)
+aux_source_directory("src/uEmbedded-pp" SRC_C)
 aux_source_directory(testcase TESTCASE)
 
 # Core library build.
@@ -45,5 +45,5 @@ install( FILES "src/uEmbedded/*.h" DESTINATION ${DEST_DIR_NAME}/include )
 install( FILES "src/uEmbedded/*.hpp" DESTINATION ${DEST_DIR_NAME}/include ) 
 
 # Cpp library
-file(GLOB_RECURSE SRC_CPP "cppsrc/*.cpp")
-add_library(uembedded_cpp STATIC ${SRC_CPP})
+# file(GLOB_RECURSE SRC_CPP "src/*.cpp")
+# add_library(uembedded_cpp STATIC ${SRC_CPP})
