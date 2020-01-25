@@ -10,6 +10,7 @@ include_directories(${SRC_C_INC_DIR})
 include_directories(${SRC_CPP_INC_DIR})
 
 aux_source_directory("src/uEmbedded" SRC_C) 
+aux_source_directory("src/uEmbedded-pp" SRC_C) 
 aux_source_directory(testcase TESTCASE)
 
 # Core library build.

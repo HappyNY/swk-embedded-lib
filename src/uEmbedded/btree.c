@@ -1,5 +1,5 @@
 #include "btree.h"
-#include "uemb_assert.h"
+#include "uassert.h"
 #include <string.h>
 
 typedef struct btree_node node_t;
@@ -7,22 +7,22 @@ typedef struct btree_node node_t;
 static inline
 size_t getNodeIdx(btree_t const* s, struct btree_node const* n)
 {
-    uemb_assert(s && n);
-    uemb_assert(s->pool <= n && n < s->pool + s->capacity);
+    uassert(s && n);
+    uassert(s->pool <= n && n < s->pool + s->capacity);
     return n - s->pool;
 }
 
 static inline
 void* getNodeData(btree_t const* s, node_t const* n)
 {
-    uemb_assert(s && n);
+    uassert(s && n);
     return (void *)(s->data + s->elemSize * getNodeIdx(s, n));
 }
 
 static inline
 node_t* widthdraw(btree_t* s)
 {
-    uemb_assert(s);
+    uassert(s);
     node_t *ret = s->pool;
     s->pool = ret->right;
     ret->right = NULL;
@@ -32,7 +32,7 @@ node_t* widthdraw(btree_t* s)
 static inline
 void deposit(btree_t* s, node_t *n)
 {
-    uemb_assert(s && n);
+    uassert(s && n);
     n->left = NULL;
     n->right = s->pool;
     s->pool = n;
@@ -41,10 +41,10 @@ void deposit(btree_t* s, node_t *n)
 
 size_t btree_init(btree_t *s, void *buff, size_t buffSize, size_t elemSize, btree_compare_func_t compare)
 {
-    uemb_assert(s);
-    uemb_assert(buff);
-    uemb_assert(buffSize);
-    uemb_assert(compare);
+    uassert(s);
+    uassert(buff);
+    uassert(buffSize);
+    uassert(compare);
     
     enum { nodeSz = sizeof(struct btree_node) };
     size_t chunkSz = elemSize + nodeSz;
