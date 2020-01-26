@@ -19,12 +19,22 @@ namespace impl {
 
 template <typename nty_>
 struct fslist_node {
+    enum { NODE_NONE = (nty_)-1 };
     nty_ nxt_;
     nty_ prv_;
 
     nty_ cur() { return cur_; }
 
+    fslist_node<nty_>& prev() { return by_( prv_ ); }
+    fslist_node<nty_>& next() { return by_( nxt_ ); }
+
 private:
+    fslist_node<nty_>& by_( int absolute )
+    {
+        uassert( nxt_ != NODE_NONE && prv_ != NODE_NONE );
+        return *( this + cur_ - absolute );
+    }
+
     nty_ cur_;
     template <typename t_>
     friend class fslist_alloc_base;
@@ -43,9 +53,9 @@ protected:
         // Link all available nodes
         for ( size_t i = 0; i < capacity; i++ ) {
             auto p  = narray_ + i;
-            p->nxt_ = i + 1;
+            p->nxt_ = static_cast<size_type>( i + 1 );
             p->cur_ = NODE_NONE;
-            p->prv_ = i - 1;
+            p->prv_ = static_cast<size_type>( i - 1 );
         }
         narray_[0].prv_             = NODE_NONE;
         narray_[capacity_ - 1].nxt_ = NODE_NONE;
@@ -71,6 +81,9 @@ protected:
             if ( tail_ != NODE_NONE ) {
                 narray_[tail_].nxt_ = i;
             }
+            else { // tail is empty == head is empty
+                head_ = i;
+            }
             tail_ = i;
         }
         else {
@@ -79,12 +92,12 @@ protected:
             }
             node_type& n_at = narray_[at];
             uassert( n_at.cur_ != NODE_NONE );
-            n.nxt_    = at;
-            n.prv_    = n_at.prv_;
-            n_at.prv_ = i;
+            n.nxt_ = at;
+            n.prv_ = n_at.prv_;
             if ( n_at.prv_ != NODE_NONE ) {
-                narray_[n_at.prv_].nxt_ = i;
+                n_at.prev().nxt_ = i;
             }
+            n_at.prv_ = i;
         }
     }
 
@@ -97,14 +110,24 @@ protected:
         if ( n.nxt_ != NODE_NONE ) {
             narray_[n.nxt_].prv_ = n.prv_;
         }
+        else { // It's tail
+            tail_ = n.prv_;
+        }
+
         if ( n.prv_ != NODE_NONE ) {
             narray_[n.prv_].nxt_ = n.nxt_;
         }
-        n.prv_              = NODE_NONE;
-        n.cur_              = NODE_NONE;
-        n.nxt_              = idle_;
-        narray_[idle_].prv_ = i;
-        idle_               = i;
+        else { // It's head
+            head_ = n.nxt_;
+        }
+
+        if ( idle_ != NODE_NONE ) {
+            narray_[idle_].prv_ = i;
+        }
+        n.prv_ = NODE_NONE;
+        n.cur_ = NODE_NONE;
+        n.nxt_ = idle_;
+        idle_  = i;
         --size_;
     }
 
@@ -117,8 +140,10 @@ protected:
     bool valid_node( size_type n ) const noexcept { return n != NODE_NONE && narray_[n].cur_ != NODE_NONE; }
 
 public:
-    size_type capacity() const noexcept { return capacity_; }
+    size_type max_size() const noexcept { return capacity_; }
+    size_type capacity() const noexcept { return capacity_ - size_; }
     size_type size() const noexcept { return size_; }
+    bool      empty() const noexcept { return size_ == 0; }
 
     template <typename ty1_, typename ty_2>
     friend class fslist_const_iterator;
@@ -154,6 +179,12 @@ public:
     pointer                            operator->() const noexcept;
 
     bool operator!=( const fslist_const_iterator<dty_, nty_>& r ) const noexcept { return r.container_ != container_ || r.cur_ != cur_; }
+    bool operator==( const fslist_const_iterator<dty_, nty_>& r ) const noexcept { return r.container_ == container_ && r.cur_ == cur_; }
+
+    bool valid() const noexcept { return container_->valid_node( cur_ ); }
+    operator bool() const noexcept { return valid(); }
+
+    size_type fs_idx__() const noexcept { return cur_; }
 
 private:
     container_type const* container_;
@@ -205,6 +236,12 @@ public:
     }
 
     bool operator!=( fslist_iterator const& b ) const noexcept { return (super&)*this != (super&)b; }
+    bool operator==( fslist_iterator const& b ) const noexcept { return (super&)*this == (super&)b; }
+
+    operator super() const noexcept
+    {
+        return static_cast<super&> * this;
+    }
 };
 
 //! Base class for list
@@ -229,8 +266,16 @@ public:
 public:
     ~fslist_base() noexcept
     {
-        for ( size_type i = super::head(); i != NODE_NONE; i = super::next( i ) ) {
+        clear();
+    }
+
+    void clear() noexcept
+    {
+        for ( size_type i = super::head(); i != NODE_NONE; ) {
             varray_[i].~value_type();
+            auto k = i;
+            i      = super::next( i );
+            super::dealloc_node( k );
         }
     }
 
@@ -243,7 +288,7 @@ public:
     {
         auto n = super::alloc_node();
         super::insert_node( n, super::head() );
-        auto p = new ( &varray_[n] ) value_type( std::forward<arg_>( args )... );
+        auto p = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
 
@@ -252,7 +297,7 @@ public:
     {
         auto n = super::alloc_node();
         super::insert_node( n, NODE_NONE );
-        auto p = new ( &varray_[n] ) value_type( std::forward<arg_>( args )... );
+        auto p = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
 
@@ -285,13 +330,13 @@ public:
     iterator begin() noexcept { return static_cast<iterator&>( cbegin() ); }
     iterator end() noexcept { return static_cast<iterator&>( cend() ); }
 
-    const reference front() const noexcept
+    const_reference front() const noexcept
     {
         uassert( valid_node( super::head() ) );
         return varray_[super::head()];
     }
 
-    const reference back() const noexcept
+    const_reference back() const noexcept
     {
         uassert( valid_node( super::tail() ) );
         return varray_[super::tail()];
@@ -309,9 +354,69 @@ public:
         return varray_[super::tail()];
     }
 
+    template <typename... ty__>
+    iterator emplace( const_iterator pos, ty__&&... args ) noexcept
+    {
+        uassert( super::size() < super::max_size() );
+        auto n = super::alloc_node();
+        super::insert_node( n, pos.cur_ );
+
+        auto p = new ( varray_ + n ) value_type( std::forward<ty__>( args )... );
+
+        const_iterator r;
+        r.container_ = this;
+        r.cur_       = n;
+        return static_cast<iterator&>( r );
+    }
+
+    iterator insert( const_iterator pos, const value_type& arg ) noexcept
+    {
+        return emplace( pos, arg );
+    }
+
+    template <typename it_>
+    iterator insert( const_iterator pos, it_ begin, it_ end ) noexcept
+    {
+        for ( ; begin != end; ++begin ) {
+            pos = emplace( pos, *begin );
+        }
+    }
+
+    void pop_back() noexcept
+    {
+        release( super::tail() );
+    }
+
+    void pop_front() noexcept
+    {
+        release( super::head() );
+    }
+
+    void erase( const_iterator pos ) noexcept
+    {
+        release( pos.cur_ );
+    }
+
+    const_pointer at__( size_type fs_idx ) const noexcept
+    {
+        return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr;
+    }
+
+    pointer at__( size_type fs_idx ) noexcept
+    {
+        return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr;
+    }
+
 private:
     template <typename ty1_, typename ty2_>
     friend class fslist_const_iterator;
+
+    void release( size_type n )
+    {
+        uassert( n != NODE_NONE );
+        varray_[n].~value_type();
+        super::dealloc_node( n );
+    }
 
     pointer get_arg( size_type node ) noexcept
     {
@@ -369,7 +474,7 @@ inline typename fslist_const_iterator<dty_, nty_>::reference fslist_const_iterat
 template <typename dty_, typename nty_>
 inline typename fslist_const_iterator<dty_, nty_>::pointer fslist_const_iterator<dty_, nty_>::operator->() const noexcept
 {
-    auto c = static_cast<fslist_base<dty_, nty_>>( container_ );
+    auto c = static_cast<fslist_base<dty_, nty_>*>( const_cast<fslist_alloc_base<nty_>*>( container_ ) );
     return c->get_arg( cur_ );
 }
 
