@@ -38,7 +38,7 @@ protected:
     using node_type       = fslist_node<size_type>;
     enum { NODE_NONE = (size_type)-1 };
 
-    fslist_alloc_base( size_type capacity, node_type* narray ) noexcept : capacity_( capacity ), narray_( narray ), size_( 0 ), head_( NODE_NONE ), tail_( NODE_NONE ), idle_( 0 )
+    fslist_alloc_base( size_type capacity, node_type* narray ) noexcept : size_( 0 ), capacity_( capacity ), head_( NODE_NONE ), tail_( NODE_NONE ), idle_( 0 ), narray_( narray )
     {
         // Link all available nodes
         for ( size_t i = 0; i < capacity; i++ ) {
@@ -120,7 +120,7 @@ public:
     size_type capacity() const noexcept { return capacity_; }
     size_type size() const noexcept { return size_; }
 
-    template <typename dty_, typename nty_>
+    template <typename ty1_, typename ty_2>
     friend class fslist_const_iterator;
 
 private:
@@ -152,14 +152,15 @@ public:
     fslist_const_iterator<dty_, nty_>  operator--( int ) noexcept;
     reference                          operator*() const noexcept;
     pointer                            operator->() const noexcept;
-    friend bool                        operator!=( fslist_const_iterator const& a, fslist_const_iterator const& b ) noexcept;
+
+    bool operator!=( const fslist_const_iterator<dty_, nty_>& r ) const noexcept { return r.container_ != container_ || r.cur_ != cur_; }
 
 private:
     container_type const* container_;
     size_type             cur_;
 
 private:
-    template <typename dty_, typename nty_>
+    template <typename ty1_, typename ty2_>
     friend class fslist_base;
 };
 
@@ -173,7 +174,7 @@ public:
     using reference         = dty_&;
     using size_type         = nty_;
     using container_type    = fslist_alloc_base<nty_>;
-    using super             = fslist_const_iterator;
+    using super             = fslist_const_iterator<dty_, nty_>;
 
     fslist_iterator<dty_, nty_>& operator++() noexcept
     {
@@ -206,12 +207,6 @@ public:
     bool operator!=( fslist_iterator const& b ) const noexcept { return (super&)*this != (super&)b; }
 };
 
-template <typename dty_, typename nty_>
-bool operator!=( fslist_const_iterator<dty_, nty_> const& a, fslist_const_iterator<dty_, nty_> const& b ) noexcept
-{
-    return a.container_ != b.container_ || a.cur_ != b.cur_;
-}
-
 //! Base class for list
 template <typename dty_,
           typename nty_ = size_t>
@@ -228,12 +223,13 @@ public:
     using node_type       = fslist_node<size_type>;
     using iterator        = fslist_iterator<value_type, size_type>;
     using const_iterator  = fslist_const_iterator<value_type, size_type>;
+    using super           = fslist_alloc_base<nty_>;
     enum { NODE_NONE = (size_type)-1 };
 
 public:
     ~fslist_base() noexcept
     {
-        for ( size_type i = head(); i != NODE_NONE; i = next( i ) ) {
+        for ( size_type i = super::head(); i != NODE_NONE; i = super::next( i ) ) {
             varray_[i].~value_type();
         }
     }
@@ -245,8 +241,8 @@ public:
     template <typename... arg_>
     reference emplace_front( arg_&&... args ) noexcept
     {
-        auto n = alloc_node();
-        insert_node( n, head() );
+        auto n = super::alloc_node();
+        super::insert_node( n, super::head() );
         auto p = new ( &varray_[n] ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
@@ -254,8 +250,8 @@ public:
     template <typename... arg_>
     reference emplace_back( arg_&&... args ) noexcept
     {
-        auto n = alloc_node();
-        insert_node( n, NODE_NONE );
+        auto n = super::alloc_node();
+        super::insert_node( n, NODE_NONE );
         auto p = new ( &varray_[n] ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
@@ -274,7 +270,7 @@ public:
     {
         const_iterator i;
         i.container_ = this;
-        i.cur_       = head();
+        i.cur_       = super::head();
         return i;
     }
 
@@ -291,38 +287,36 @@ public:
 
     const reference front() const noexcept
     {
-        uassert( valid_node( head() ) );
-        return varray_[head()];
+        uassert( valid_node( super::head() ) );
+        return varray_[super::head()];
     }
 
     const reference back() const noexcept
     {
-        uassert( valid_node( tail() ) );
-        return varray_[tail()];
+        uassert( valid_node( super::tail() ) );
+        return varray_[super::tail()];
     }
 
     reference front() noexcept
     {
-        uassert( valid_node( head() ) );
-        return varray_[head()];
+        uassert( valid_node( super::head() ) );
+        return varray_[super::head()];
     }
 
     reference back() noexcept
     {
-        uassert( valid_node( tail() ) );
-        return varray_[tail()];
+        uassert( valid_node( super::tail() ) );
+        return varray_[super::tail()];
     }
 
-    
-
 private:
-    template <typename dty_, typename nty_>
+    template <typename ty1_, typename ty2_>
     friend class fslist_const_iterator;
 
     pointer get_arg( size_type node ) noexcept
     {
         uassert( node != NODE_NONE );
-        uassert( valid_node( node ) );
+        uassert( super::valid_node( node ) );
         return varray_ + node;
     }
 
