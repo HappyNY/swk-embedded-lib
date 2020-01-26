@@ -3,6 +3,7 @@ extern "C" {
 #include <uEmbedded/timer_logic.h>
 }
 
+#include <list>
 #include <uEmbedded-pp/static_timer_logic.hxx>
 
 TEST_CASE( "Timer logic functionality test", "[timer-logic]" )
@@ -50,9 +51,11 @@ TEST_CASE( "Timer logic functionality test", "[timer-logic]" )
 
 TEST_CASE( "Timer logic cpp version test", "[timer-logic]" )
 {
-    upp::timer_logic<uint64_t, uint8_t, 128> tim;
-    decltype( tim )::tick_type               ticks = 0;
-    std::vector<int>                         tester;
+    using list_ty = std::list<upp::timer_logic_desc<uint64_t>>;
+    upp::timer_logic<uint64_t, list_ty> tim;
+
+    decltype( tim )::tick_type ticks = 0;
+    std::vector<int>           tester;
 
     tim.tick_function( [&ticks]() { return ticks; } );
 
@@ -82,7 +85,7 @@ TEST_CASE( "Timer logic cpp version test", "[timer-logic]" )
     tim.update();
     REQUIRE( tester.size() == 2 );
     REQUIRE( tim.size() == 2 );
-    
+
     ticks = 6000;
     tim.update();
     REQUIRE( tester.size() == 4 );

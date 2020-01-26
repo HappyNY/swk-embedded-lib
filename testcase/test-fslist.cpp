@@ -70,7 +70,7 @@ TEST_CASE( "fslist functionalities.", "[fslist]" )
 
 TEST_CASE( "fslist Cplusplus version", "[fslist]" )
 {
-    constexpr size_t num_case = 1000;
+    constexpr size_t num_case = 55;
 
     upp::static_fslist<double, size_t, num_case> f;
 

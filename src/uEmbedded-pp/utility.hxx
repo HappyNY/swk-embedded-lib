@@ -1,5 +1,11 @@
 #pragma once
+
+#if __cplusplus < 201700L
 #include <experimental/optional>
+#else
+#include <optional> 
+#endif
+
 #include <stdint.h>
 namespace upp {
 namespace hash {
@@ -27,7 +33,12 @@ inline constexpr uint64_t fnv1a_64( const char* const str, const uint64_t value 
 
 } // namespace hash
 
+#if __cplusplus < 201700L 
 template <class ty__>
 using optional = std::experimental::optional<ty__>;
+#else
+template <class ty__>
+using optional = std::optional<ty__>;
+#endif
 
 } // namespace upp

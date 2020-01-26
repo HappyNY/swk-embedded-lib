@@ -31,7 +31,7 @@ template <typename tick_ty__,
 class timer_logic {
 public:
     using desc_type      = timer_logic_desc<tick_ty__>;
-    using tick_type      = tick_ty__; 
+    using tick_type      = tick_ty__;
     using tick_fnc_type  = std::function<tick_type( void )>;
     using container_type = list_container__;
     using handle_type    = impl::timer_handle<tick_ty__, typename container_type::const_iterator>;
@@ -93,7 +93,7 @@ public:
     tick_type update() noexcept
     {
         for ( auto it = node_.begin();
-              it && it->trigger_at_ <= tick_();
+              it != node_.end() && it->trigger_at_ <= tick_();
               it = node_.begin() ) {
             auto cb  = it->cb_;
             auto obj = it->obj_;
