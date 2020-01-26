@@ -14,8 +14,8 @@ public:
     using reference       = value_type&;
     using const_pointer   = value_type const*;
     using const_reference = value_type const;
-    using iterator        = super::iterator;
-    using const_iterator  = super::const_iterator;
+    using iterator        = typename super::iterator;
+    using const_iterator  = typename super::const_iterator;
 
 public:
     static_fslist()

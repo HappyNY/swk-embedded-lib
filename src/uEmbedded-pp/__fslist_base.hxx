@@ -240,7 +240,7 @@ public:
 
     operator super() const noexcept
     {
-        return static_cast<super&> * this;
+        return static_cast<super&>(*this );
     }
 };
 

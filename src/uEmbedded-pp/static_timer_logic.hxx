@@ -1,8 +1,8 @@
 #pragma once
 #include "static_fslist.hxx"
+#include "utility.hxx"
 #include <algorithm>
 #include <functional>
-#include <optional>
 #include <stdint.h>
 
 namespace upp {
@@ -40,9 +40,9 @@ public:
     using handle_type    = impl::timer_handle<tick_ty__, typename container_type::const_iterator>;
 
 public:
-    tick_fnc_type const& tick_function() const { return tick_; }
+    tick_fnc_type const& tick_function() const noexcept { return tick_; }
     template <class tick_fnc__>
-    void tick_function( tick_fnc__&& v ) { tick_ = std::forward<tick_fnc__>( v ); }
+    void tick_function( tick_fnc__&& v ) noexcept { tick_ = std::forward<tick_fnc__>( v ); }
 
     handle_type add( tick_type delay, void* obj, timer_cb_t callback ) noexcept
     {
@@ -88,7 +88,7 @@ public:
         return node_.front().trigger_at_;
     }
 
-    std::optional<desc_type> browse( handle_type t ) const noexcept
+    upp::optional<desc_type> browse( handle_type t ) const noexcept
     {
         if ( t.at_ &&
              t.at_->id_ == t.id_ ) {
