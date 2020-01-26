@@ -1,9 +1,11 @@
 #include <Catch2/catch.hpp>
+#include <algorithm>
+#include <list>
 
 extern "C" {
 #include <uEmbedded/fslist.h>
 }
-#include <uEmbedded-pp/__falist_base.hpp>
+#include <uEmbedded-pp/static_fslist.hxx>
 int v;
 
 TEST_CASE( "fslist functionalities.", "[fslist]" )
@@ -68,19 +70,40 @@ TEST_CASE( "fslist functionalities.", "[fslist]" )
 
 TEST_CASE( "fslist Cplusplus version", "[fslist]" )
 {
-    using namespace upp::impl;
-    constexpr int                  num_case = 100;
-    double                         vbuf[num_case];
-    upp::impl::fslist_node<size_t> nbuf[num_case];
-    fslist_base<double, size_t>    f{ num_case, vbuf, nbuf };
+    constexpr size_t num_case = 1000;
+
+    upp::static_fslist<double, size_t, num_case> f;
 
     for ( size_t i = 0; i < num_case; i++ ) {
         f.emplace_back( rand() );
     }
 
     REQUIRE( f.size() == num_case );
+    REQUIRE( f.capacity() == 0 );
 
     for ( size_t i = 0; i < num_case / 2; i++ ) {
+        f.pop_back();
     }
 
+    REQUIRE( f.size() == num_case - num_case / 2 );
+
+    for ( size_t i = 0; i < num_case / 2; i++ ) {
+        f.emplace_front( rand() );
+    }
+
+    REQUIRE( f.capacity() == 0 );
+
+    f.clear();
+    REQUIRE(f.size() == 0);
+
+    std::vector<double> v;
+
+    for ( size_t i = 0; i < num_case; i++ ) {
+        auto val = double( rand() );
+
+        v.push_back( val );
+        f.push_back( val );
+    }
+
+    REQUIRE( std::equal( v.begin(), v.end(), f.begin(), f.end() ) );
 }
