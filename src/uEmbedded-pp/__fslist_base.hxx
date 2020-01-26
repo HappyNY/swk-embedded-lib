@@ -240,7 +240,7 @@ public:
 
     operator super() const noexcept
     {
-        return static_cast<super&>(*this );
+        return static_cast<super&>( *this );
     }
 };
 
@@ -327,8 +327,16 @@ public:
         return i;
     }
 
-    iterator begin() noexcept { return static_cast<iterator&>( cbegin() ); }
-    iterator end() noexcept { return static_cast<iterator&>( cend() ); }
+    iterator begin() noexcept
+    {
+        auto d = cbegin();
+        return static_cast<iterator&>( d );
+    }
+    iterator end() noexcept
+    {
+        auto d = cend();
+        return static_cast<iterator&>( d );
+    }
 
     const_reference front() const noexcept
     {
