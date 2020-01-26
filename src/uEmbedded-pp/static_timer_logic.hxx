@@ -112,6 +112,11 @@ public:
         return next_trig();
     }
 
+    void clear() noexcept
+    {
+        node_.clear();
+    }
+
     size_type capacity() const noexcept { return node_.capacity(); }
     size_type size() const noexcept { return node_.size(); }
     bool      empty() const noexcept { return node_.empty(); }
