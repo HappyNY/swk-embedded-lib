@@ -135,7 +135,7 @@ void ref_unlock(refhandle_t const *h)
     // Check if reference is alive.
     managed_reference_pool_t *s = *h->s;
     if (s == NULL)
-        return NULL;
+        return;
 
     refnode_t *data = fslist_data(&s->refs, h->node);
 

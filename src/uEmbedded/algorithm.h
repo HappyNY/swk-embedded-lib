@@ -3,6 +3,11 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 /*! \brief      Find lowest index to insert [eval] parameter for sorted array.
     \note       [eval] and [arr] can be different type of object if you define
    predicate function in that way. Left side of predicate function will hold
@@ -22,3 +27,7 @@ size_t lowerbound(void const *arr, void const *eval, size_t elemSize,
  */
 void *array_insert(void const *arr, void const *elem, size_t index,
                    size_t elemSize, size_t *lpNumElems);
+
+#ifdef __cplusplus
+}
+#endif

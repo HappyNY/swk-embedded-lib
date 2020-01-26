@@ -6,6 +6,10 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct timer_logic {
     struct fslist nodes;
     size_t        idGen;
@@ -101,3 +105,9 @@ static inline void timer_triggerFirst(timer_logic_t *s)
 
     cb(obj);
 }
+
+
+
+#ifdef __cplusplus
+}
+#endif

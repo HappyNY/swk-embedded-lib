@@ -13,6 +13,9 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 enum { OBJECTID_NULL = -1u };
 
 typedef struct refhandle {
@@ -39,3 +42,7 @@ bool  ref_free(refhandle_t const *h);
 void *ref_lock(refhandle_t const *h);
 void  ref_unlock(refhandle_t const *h);
 bool  ref_is_valid(refhandle_t const *h);
+
+#ifdef __cplusplus
+}
+#endif

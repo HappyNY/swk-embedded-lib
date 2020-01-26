@@ -2,6 +2,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+     
 /*! \brief          Enum type to indicate transceive result. This can hold
    normal integer values to indicate any number. \details        Return value
    under -8000 is regarded as implementation_specific error code. */
@@ -81,4 +85,8 @@ static inline transceiver_result_t td_read(transceiver_vptr_t td, char *buf,
         }
     }
     return read;
+} 
+
+#ifdef __cplusplus
 }
+#endif

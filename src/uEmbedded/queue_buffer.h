@@ -2,6 +2,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+     
 /*! @breif		Circular queue buffer.
     @details
         Since circular queue does not ensure a single memory chunk to be
@@ -59,3 +63,8 @@ static inline size_t queue_buffer_draw(queue_buffer_t *s, void *b, size_t len)
     queue_buffer_pop(s, len);
     return len;
 }
+ 
+
+#ifdef __cplusplus
+}
+#endif

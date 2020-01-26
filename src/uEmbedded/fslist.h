@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 #ifndef FSLIST_INDEX_TYPE
 #define FSLIST_INDEX_TYPE uint16_t
 #endif
@@ -127,3 +131,8 @@ struct fslist_node *fslist_insert(struct fslist *s, struct fslist_node *n);
 
 /*! \brief      Remove given node from list. */
 void fslist_erase(struct fslist *s, struct fslist_node *n);
+
+
+#ifdef __cplusplus
+}
+#endif

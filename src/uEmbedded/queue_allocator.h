@@ -3,6 +3,10 @@
 #include "allocator.h"
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 struct queue_allocator {
     size_t head;
     size_t tail;
@@ -28,3 +32,8 @@ void queue_allocator_pop(struct queue_allocator *s);
 /*! \brief Peek next data which pending to be popped on next pop() call. Data
  * size will also be returned. */
 void *queue_allocator_peek(struct queue_allocator *s, size_t *size);
+  
+
+#ifdef __cplusplus
+}
+#endif

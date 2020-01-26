@@ -14,6 +14,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif 
+
 typedef void (*EventCallbackType)(void *);
 
 /*! \brief Queue descriptor. */
@@ -54,3 +58,8 @@ void QueueEvent(struct EventQueue *queue, EventCallbackType callback,
    number of requests. */
 void ProcessEvent(struct EventQueue *queue, void (*lock)(void *),
                   void (*unlock)(void *), void *lockobj);
+
+
+#ifdef __cplusplus
+}
+#endif

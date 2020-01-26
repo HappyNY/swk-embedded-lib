@@ -5,6 +5,7 @@ project(uembedded_c)
 set(DEST_DIR_NAME "uembedded_c") 
 set(SRC_C_INC_DIR "src")
 set(SRC_CPP_INC_DIR "cppsrc")
+set(CMAKE_CXX_STANDARD 17)
 
 include_directories(${SRC_C_INC_DIR})
 include_directories(${SRC_CPP_INC_DIR})

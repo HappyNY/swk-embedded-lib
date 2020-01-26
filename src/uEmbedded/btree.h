@@ -3,6 +3,10 @@
 #include <stdint.h>
 #include <stdbool.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /*! \brief
     A function callback that returns \n
         l > r -> val > 0 \n
@@ -96,3 +100,7 @@ bool btree_erase(btree_t *s, void const*data);
     \param cb 
  */
 void btree_forEach(btree_t *s, void* obj, void (*cb)(void*, void const*));
+
+#ifdef __cplusplus
+}
+#endif

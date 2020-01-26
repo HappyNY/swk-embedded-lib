@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdlib.h>
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 //! \breif      Priority queue struct. Based on minimum heap.
 //! \warning    Not thread-safe!
 struct priority_queue {
@@ -42,3 +46,7 @@ static inline void *pqueue_peek(struct priority_queue *s)
     uassert(s && s->cnt);
     return s->buff;
 }
+
+#ifdef __cplusplus
+}
+#endif
