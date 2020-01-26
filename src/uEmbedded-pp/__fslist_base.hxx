@@ -369,7 +369,7 @@ public:
         auto n = super::alloc_node();
         super::insert_node( n, pos.cur_ );
 
-        auto p = new ( varray_ + n ) value_type( std::forward<ty__>( args )... );
+        new ( varray_ + n ) value_type( std::forward<ty__>( args )... );
 
         const_iterator r;
         r.container_ = this;
