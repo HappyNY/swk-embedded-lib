@@ -12,4 +12,6 @@ void fslist_base_build_test()
 {
     fslist_base<double> f{ 10, NULL, NULL };
     f.push_front( 3 );
+
+    int c;
 }
