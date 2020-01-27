@@ -67,12 +67,12 @@ TEST_CASE( "Queue functionality test", "[Queue]" )
 
 using namespace std;
 
-TEST_CASE( "Buffer test", "[queue_buffer]" )
+TEST_CASE( "Buffer test", "[ring_buffer]" )
 {
     static char buff[0x10000];
-    queue_buffer_t v;
+    ring_buffer_t v;
 
-    queue_buffer_init( &v, buff, sizeof( buff ) );
+    ring_buffer_init( &v, buff, sizeof( buff ) );
 
     // @todo.
 }

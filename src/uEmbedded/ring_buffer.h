@@ -20,7 +20,7 @@ extern "C" {
     @warning
         There is no safeguard for overflow to maximize embedded performance.
 */
-struct queue_buffer {
+struct ring_buffer {
     //!
     char *buff;
 
@@ -35,32 +35,32 @@ struct queue_buffer {
 };
 
 //! Alias of class
-typedef struct queue_buffer queue_buffer_t;
+typedef struct ring_buffer ring_buffer_t;
 
 /*! \breif		Initiate buffer */
-void queue_buffer_init(queue_buffer_t *s, void *buff, size_t buffSz);
+void ring_buffer_init(ring_buffer_t *s, void *buff, size_t buffSz);
 
 /*! \breif		Push data into queue buffer */
-void queue_buffer_push(queue_buffer_t *s, void const *d, size_t len);
+void ring_buffer_write(ring_buffer_t *s, void const *d, size_t len);
 
 /*! \breif		Pop data from queue buffer. */
-void queue_buffer_pop(queue_buffer_t *s, size_t len);
+void ring_buffer_consume(ring_buffer_t *s, size_t len);
 
 /*! \breif		Peek data from queue buffer. */
-void queue_buffer_peek(queue_buffer_t const *s, void *b, size_t len);
+void ring_buffer_peek(ring_buffer_t const *s, void *b, size_t len);
 
 /*! \breif      Get current data cnt */
-size_t queue_buffer_size(queue_buffer_t const *s);
+size_t ring_buffer_size(ring_buffer_t const *s);
 
-/*! \breif      Do popping and peeking at once.
+/*! \breif      Do peeking and consuming at once.
     \return     Number of byte actually read. */
-static inline size_t queue_buffer_draw(queue_buffer_t *s, void *b, size_t len)
+static inline size_t ring_buffer_read(ring_buffer_t *s, void *b, size_t len)
 {
-    size_t sz = queue_buffer_size(s);
+    size_t sz = ring_buffer_size(s);
     if (sz < len)
         len = sz;
-    queue_buffer_peek(s, b, len);
-    queue_buffer_pop(s, len);
+    ring_buffer_peek(s, b, len);
+    ring_buffer_consume(s, len);
     return len;
 }
  
