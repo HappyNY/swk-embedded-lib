@@ -5,7 +5,7 @@
 #ifdef __cplusplus
 extern "C" {
 #endif
-     
+
 /*! \brief          Enum type to indicate transceive result. This can hold
    normal integer values to indicate any number. \details        Return value
    under -8000 is regarded as implementation_specific error code. */
@@ -27,30 +27,22 @@ enum {
 
 /*! \brief      Function table to imitate the inheritance feature. */
 struct transceiver_vtable {
-    //! \brief      This function must return control right away with any
-    //! result. \details    If the connection is valid and there's nothing to
-    //! read in the buffer or something, it should return zero to indicate that
-    //! there's nothing to read.
-    transceiver_result_t (*status)(void * /*obj*/);
-
     //! \brief      If the connection is valid, this function must wait until
     //! the data receive.
-    transceiver_result_t (*read)(void * /*obj*/, char * /*rdbuf*/,
-                                 size_t /*rdcnt*/);
+    transceiver_result_t ( *read )( void* /*obj*/, char* /*rdbuf*/,
+                                    size_t /*rdcnt*/ );
 
     //! \brief      Tries write to transceiver.
     //! \returns    Number of bytes written to transmit buffer. Otherwise 0 or
     //! negative value to indicate the operation has failed.
-    transceiver_result_t (*write)(void * /*obj*/, char const * /*wrbuf*/,
-                                  size_t /*wrcnt*/);
+    transceiver_result_t ( *write )( void* /*obj*/, char const* /*wrbuf*/,
+                                     size_t /*wrcnt*/ );
 
-    //! \brief      Notifies transceiver to try to connect.
-    //! \details    To make the connection process begin, all required
-    //! parameters must be supplied before calling this function.
-    transceiver_result_t (*open)(void * /*obj*/);
+    //! Controls IO
+    transceiver_result_t ( *ioctl )( void* /*obj*/, intptr_t /*cmd*/ );
 
-    //! \brief      Request close this transceiver.
-    transceiver_result_t (*close)(void * /*obj*/);
+    //! Controls IO
+    transceiver_result_t ( *close )( void* /*obj*/ );
 };
 
 //! Alias to easy use.
@@ -65,28 +57,35 @@ typedef struct transceiver_vtable transceiver_vtable_t;
    implementation struct that its value starts with given transceiver instance's
    address. Therefore, placing this base type at the mid of the other members
    can make the rest of the development process confusing.*/
-typedef struct transceiver_vtable *transceiver_vptr_t;
+typedef intptr_t transceiver_descriptor_t;
 
-//! \brief Read data from the transceiver. It blocks until reading all 'rdcnt'
-//! bytes of data.
-static inline transceiver_result_t td_read(transceiver_vptr_t td, char *buf,
-                                           size_t rdcnt)
+//! Read data from the transceiver.
+static inline transceiver_result_t td_read( transceiver_descriptor_t desc, char* buf, size_t rdcnt )
 {
-    transceiver_result_t trres;
-    transceiver_result_t read;
+    transceiver_vtable_t* td = (transceiver_vtable_t*)desc;
+    return td->read( (void*)td, buf, rdcnt );
+}
 
-    while (rdcnt) {
-        trres = td->read((void *)td, buf, rdcnt);
-        if (trres < 0)
-            return trres; // Allready read data will be discarded.
-        else {
-            rdcnt -= trres;
-            read += trres;
-        }
-    }
-    return read;
-} 
+//! Write data into the transceiver
+static inline transceiver_result_t td_write( transceiver_descriptor_t desc, char* buf, size_t wrcnt )
+{
+    transceiver_vtable_t* td = (transceiver_vtable_t*)desc;
+    return td->write( (void*)td, buf, wrcnt );
+}
 
+//! Deliever control command to transceiver
+static inline transceiver_result_t td_ioctl( transceiver_descriptor_t desc, intptr_t cmd )
+{
+    transceiver_vtable_t* td = (transceiver_vtable_t*)desc;
+    return td->ioctl( td, cmd );
+}
+
+//! Close transceiver
+static inline transceiver_result_t td_close( transceiver_descriptor_t desc )
+{
+    transceiver_vtable_t* td = (transceiver_vtable_t*)desc;
+    return td->close( td );
+}
 #ifdef __cplusplus
 }
 #endif
