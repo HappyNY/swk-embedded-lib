@@ -62,31 +62,31 @@ typedef struct tranceiver_desc {
    implementation struct that its value starts with given transceiver instance's
    address. Therefore, placing this base type at the mid of the other members
    can make the rest of the development process confusing.*/
-typedef intptr_t transceiver_descriptor_t;
+typedef intptr_t transceiver_handle_t;
 
 //! Read data from the transceiver.
-static inline transceiver_result_t td_read( transceiver_descriptor_t desc, char* buf, size_t rdcnt )
+static inline transceiver_result_t td_read( transceiver_handle_t desc, char* buf, size_t rdcnt )
 {
     transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->read( (void*)desc, buf, rdcnt );
 }
 
 //! Write data into the transceiver
-static inline transceiver_result_t td_write( transceiver_descriptor_t desc, char* buf, size_t wrcnt )
+static inline transceiver_result_t td_write( transceiver_handle_t desc, char* buf, size_t wrcnt )
 {
     transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->write( (void*)desc, buf, wrcnt );
 }
 
 //! Deliever control command to transceiver
-static inline transceiver_result_t td_ioctl( transceiver_descriptor_t desc, intptr_t cmd )
+static inline transceiver_result_t td_ioctl( transceiver_handle_t desc, intptr_t cmd )
 {
     transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->ioctl( (void*)desc, cmd );
 }
 
 //! Close transceiver
-static inline transceiver_result_t td_close( transceiver_descriptor_t desc )
+static inline transceiver_result_t td_close( transceiver_handle_t desc )
 {
     transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->close( (void*)desc );
