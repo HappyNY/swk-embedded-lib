@@ -14,6 +14,7 @@ typedef int32_t transceiver_result_t;
 /*! \brief          Types of transceiver results. */
 enum {
     TRANSCEIVER_ZERO          = 0,
+    TRANSCEIVER_OK            = 0,
     TRANSCEIVER_FAILED        = -1,
     TRANSCEIVER_NO_CONNECTION = -2,
     TRANSCEIVER_TIMEOUT       = -3,
@@ -27,12 +28,11 @@ enum {
 
 /*! \brief      Function table to imitate the inheritance feature. */
 struct transceiver_vtable {
-    //! \brief      If the connection is valid, this function must wait until
-    //! the data receive.
+    //! \brief      This must be implemented as non-block IO
     transceiver_result_t ( *read )( void* /*obj*/, char* /*rdbuf*/,
                                     size_t /*rdcnt*/ );
 
-    //! \brief      Tries write to transceiver.
+    //! \brief      Tries write to transceiver. Must be non-block IO
     //! \returns    Number of bytes written to transmit buffer. Otherwise 0 or
     //! negative value to indicate the operation has failed.
     transceiver_result_t ( *write )( void* /*obj*/, char const* /*wrbuf*/,
@@ -51,7 +51,7 @@ typedef struct transceiver_vtable transceiver_vtable_t;
 //! Actual transceiver desriptor type
 typedef struct tranceiver_desc {
     transceiver_vtable_t const* vt_;
-}* tr_desc_t__;
+} * tr_desc_t__;
 
 /*! \brief      The base type of all transceiver implementations.
     \details
@@ -67,29 +67,29 @@ typedef intptr_t transceiver_descriptor_t;
 //! Read data from the transceiver.
 static inline transceiver_result_t td_read( transceiver_descriptor_t desc, char* buf, size_t rdcnt )
 {
-    transceiver_vtable_t* td = ((tr_desc_t__)desc)->vt_;
+    transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->read( (void*)desc, buf, rdcnt );
 }
 
 //! Write data into the transceiver
 static inline transceiver_result_t td_write( transceiver_descriptor_t desc, char* buf, size_t wrcnt )
 {
-    transceiver_vtable_t* td = ( (tr_desc_t__) desc )->vt_;
-    return td->write( (void*)td, buf, wrcnt );
+    transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
+    return td->write( (void*)desc, buf, wrcnt );
 }
 
 //! Deliever control command to transceiver
 static inline transceiver_result_t td_ioctl( transceiver_descriptor_t desc, intptr_t cmd )
 {
-    transceiver_vtable_t* td = ( (tr_desc_t__) desc )->vt_;
-    return td->ioctl( td, cmd );
+    transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
+    return td->ioctl( (void*)desc, cmd );
 }
 
 //! Close transceiver
 static inline transceiver_result_t td_close( transceiver_descriptor_t desc )
 {
-    transceiver_vtable_t* td = ( (tr_desc_t__) desc )->vt_;
-    return td->close( td );
+    transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
+    return td->close( (void*)desc );
 }
 #ifdef __cplusplus
 }
