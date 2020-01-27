@@ -50,7 +50,7 @@ typedef struct transceiver_vtable transceiver_vtable_t;
 
 //! Actual transceiver desriptor type
 typedef struct tranceiver_desc {
-    transceiver_vtable_t* vt_;
+    transceiver_vtable_t const* vt_;
 }* tr_desc_t__;
 
 /*! \brief      The base type of all transceiver implementations.

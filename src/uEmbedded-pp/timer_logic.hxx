@@ -1,6 +1,5 @@
 #pragma once
-#include "../uEmbedded/uassert.h"
-#include "utility.hxx"
+#include "../uEmbedded/uassert.h" 
 #include <algorithm>
 #include <functional>
 #include <stdint.h>
@@ -84,10 +83,14 @@ public:
         return node_.front().trigger_at_;
     }
 
-    upp::optional<desc_type> browse( handle_type t ) const noexcept
+    bool browse( handle_type t, desc_type& out ) const noexcept
     {
         auto it = std::find_if( node_.begin(), node_.end(), [&t]( auto& d ) { return d.id_ == t.id_; } );
-        return it == node_.end() ? upp::optional<desc_type>{} : *it;
+        if ( it == node_.end() ) {
+            return false;
+        }
+        out = *it;
+        return true;
     }
 
     tick_type update() noexcept

@@ -48,7 +48,7 @@ refhandle_t refpool_malloc(managed_reference_pool_t *s, size_t memsize)
     refhandle_t ret;
     ret.id   = data->id;
     ret.node = n;
-    ret.s    = s;
+    ret.s    = &s->ref_to_myself;
     return ret;
 }
 
@@ -84,7 +84,7 @@ void refpool_foreach(managed_reference_pool_t *s, void *caller,
     struct fslist_node *n = &s->refs.get[s->refs.head];
     refnode_t *         objref;
     refhandle_t         h;
-    h.s = s;
+    h.s = &s->ref_to_myself;
 
     while (n) {
         objref = fslist_data(&s->refs, n);
@@ -107,7 +107,7 @@ void refpool_foreach(managed_reference_pool_t *s, void *caller,
     }
 }
 
-void *ref_lock(refhandle_t const *h)
+void *ref_lock(refhandle_t *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
 
@@ -128,7 +128,7 @@ void *ref_lock(refhandle_t const *h)
     }
 }
 
-void ref_unlock(refhandle_t const *h)
+void ref_unlock(refhandle_t *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
 
@@ -153,7 +153,7 @@ void ref_unlock(refhandle_t const *h)
     }
 }
 
-bool ref_free(refhandle_t const *h)
+bool ref_free(refhandle_t *h)
 {
     uassert(h->s && h->id != OBJECTID_NULL);
 

@@ -1,5 +1,4 @@
-#include "__fslist_base.hxx"
-#include <array>
+#include "__fslist_base.hxx" 
 
 namespace upp {
 
@@ -24,8 +23,8 @@ public:
     }
 
 private:
-    std::array<value_ty__, cap__>                   vbuf;
-    std::array<impl::fslist_node<size_ty__>, cap__> nbuf;
+    value_ty__                   vbuf[cap__];
+    impl::fslist_node<size_ty__> nbuf[cap__];
 };
 
 } // namespace upp
