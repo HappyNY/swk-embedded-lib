@@ -1,5 +1,5 @@
 #pragma once
-#include "../uEmbedded/uassert.h" 
+#include "../uEmbedded/uassert.h"
 #include <algorithm>
 #include <functional>
 #include <stdint.h>
@@ -10,7 +10,7 @@ enum { TIMER_INVALID = -1 };
 
 namespace impl {
 
-template <typename tick_ty__, typename it__>
+template <typename tick_ty__>
 struct timer_handle {
     tick_ty__ id_;
 };
@@ -33,7 +33,7 @@ public:
     using tick_type      = tick_ty__;
     using tick_fnc_type  = std::function<tick_type( void )>;
     using container_type = list_container__;
-    using handle_type    = impl::timer_handle<tick_ty__, typename container_type::const_iterator>;
+    using handle_type    = impl::timer_handle<tick_ty__>;
 
 public:
     tick_fnc_type const& tick_function() const noexcept { return tick_; }
