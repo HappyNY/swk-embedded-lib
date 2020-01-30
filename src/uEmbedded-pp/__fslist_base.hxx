@@ -340,25 +340,25 @@ public:
 
     const_reference front() const noexcept
     {
-        uassert( valid_node( super::head() ) );
+        uassert( super::valid_node( super::head() ) );
         return varray_[super::head()];
     }
 
     const_reference back() const noexcept
     {
-        uassert( valid_node( super::tail() ) );
+        uassert( super::valid_node( super::tail() ) );
         return varray_[super::tail()];
     }
 
     reference front() noexcept
     {
-        uassert( valid_node( super::head() ) );
+        uassert( super::valid_node( super::head() ) );
         return varray_[super::head()];
     }
 
     reference back() noexcept
     {
-        uassert( valid_node( super::tail() ) );
+        uassert( super::valid_node( super::tail() ) );
         return varray_[super::tail()];
     }
 
