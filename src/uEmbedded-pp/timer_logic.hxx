@@ -13,6 +13,7 @@ namespace impl {
 template <typename tick_ty__>
 struct timer_handle {
     tick_ty__ id_;
+    tick_ty__ time_;
 };
 
 } // namespace impl
@@ -58,14 +59,14 @@ public:
         node_.insert( at, d );
 
         handle_type ret;
-        ret.id_ = d.id_;
-
+        ret.id_   = d.id_;
+        ret.time_ = d.trigger_at_;
         return ret;
     }
 
-    bool remove( handle_type t ) noexcept
+    bool remove( handle_type const& t ) noexcept
     {
-        auto it = std::find_if( node_.begin(), node_.end(), [&t]( auto& d ) { return d.id_ == t.id_; } );
+        auto it = find_( t );
         if ( it != node_.end() ) {
             node_.erase( it );
             return true;
@@ -83,10 +84,10 @@ public:
         return node_.front().trigger_at_;
     }
 
-    bool browse( handle_type t, desc_type& out ) const noexcept
+    bool browse( handle_type const& t, desc_type& out ) const noexcept
     {
-        auto it = std::find_if( node_.begin(), node_.end(), [&t]( auto& d ) { return d.id_ == t.id_; } );
-        if ( it == node_.end() ) {
+        auto it = find_( t );
+        if ( it == node_.cend() ) {
             return false;
         }
         out = *it;
@@ -116,6 +117,21 @@ public:
     size_t capacity() const noexcept { return node_.max_size() - node_.size(); }
     size_t size() const noexcept { return node_.size(); }
     bool   empty() const noexcept { return node_.empty(); }
+
+private:
+    typename container_type::const_iterator
+    find_( handle_type const& h ) const
+    {
+        auto       beg = node_.cbegin();
+        auto const end = node_.cend();
+        for ( ; beg != end
+                && h.time_ < beg->trigger_at_;
+              ++beg ) {
+            if ( h.id_ == beg->id_ )
+                return beg;
+        }
+        return end;
+    }
 
 private:
     container_type node_;
