@@ -1,11 +1,11 @@
-//! A list base class
-//! @file __fslist_base.hxx
+//! @brief      A list base class
+//! @file       __fslist_base.hxx
 //!
-//! @author Seungwoo Kang (ki6080@gmail.com)
-//! @copyright Copyright (c) 2019. Seungwoo Kang. All rights reserved.
+//! @author     Seungwoo Kang (ki6080@gmail.com)
+//! @copyright  Copyright (c) 2019. Seungwoo Kang. All rights reserved.
 //!
 //! @details
-//!      This class implements thread-unsafe lightweight linked list
+//!             This class implements thread-unsafe lightweight linked list
 #pragma once
 #include <iterator>
 #include <new>
@@ -18,22 +18,25 @@
 namespace upp { namespace impl {
 //! @addtogroup uEmbedded_Cpp
 //! @{
-//! @defgroup uEmbedded_Cpp_FreeSpaceList
-//! @brief Free space list template class
+//! @defgroup   uEmbedded_Cpp_FreeSpaceList
+//! @brief
+//!             Free space list template class
 //! @details
-//!     This class is a free-space list wrapped in an easy to use template.
-//!      However, it does not recycle the uEmbedded_C library, but has been
-//!      rewritten to fit STL container interface. (e.g. iterator)
+//!              This class is a free-space list wrapped in an easy to use
+//!             template. However, it does not recycle the uEmbedded_C library,
+//!             but has been rewritten to fit STL container interface. (e.g.
+//!             iterator)
 //! @{
 
-//! @brief This class represents a node in a free space list.
-//! @tparam nty_ The free space list accepts the node index type as a template
-//!      argument. If you don't use that many nodes, you can save memory by
-//!      reducing the space taken up by one node.
+//! @brief      This class represents a node in a free space list.
+//! @tparam     nty_
+//!              The free space list accepts the node index type as a
+//!             template argument. If you don't use that many nodes, you can
+//!             save memory by reducing the space taken up by one node.
 //! @note
-//!     Unlike the C language version of the library, the C ++ version does not
-//!      use this node class directly. If you need to access an element of a
-//!      list, use an iterator instead.
+//!             Unlike the C language version of the library, the C ++ version
+//!             does not  use this node class directly. If you need to access an
+//!             element of a list, use an iterator instead.
 template <typename nty_>
 struct fslist_node
 {
@@ -61,22 +64,25 @@ private:
     friend class fslist_alloc_base;
 };
 
-//! @brief Base class of fslist that manages fslist nodes based on size type
-//!      template argument
+//! @brief
+//!             Base class of fslist that manages fslist nodes based on size
+//!             type template argument
 //! @details
-//!      Manages node list of free space list. This is managed separately from
-//!     the data type, where the location of the data is represented by an
-//!     index representing the offset in the data array instead of a pointer
-//!     to the data directly.
-//!      Functions declared as 'public' here are interfaces that are compatible
-//!     with STL containers and can be called externally through class
-//!     instances.
-//! @tparam nty_ \ref upp::impl::fslist_node
-//! @todo Provide functionality for dynamic capacity features.
-//!     Due to the nature of the free space list, it is difficult to implement
-//!     a shrink operation for memory copy, so shrinkand extend are implemented
-//!     by connecting the active node to the new node buffer from the front.
-//! @todo Implement heap based fslist
+//!             Manages node list of free space list. This is managed separately
+//!             from the data type, where the location of the data is
+//!             represented by an index representing the offset in the data
+//!             array instead of a pointer to the data directly.
+//!              Functions declared as 'public' here are interfaces that are
+//!             compatible with STL containers and can be called externally
+//!             through class instances.
+//! @tparam     nty_ \ref upp::impl::fslist_node
+//!
+//! @todo       Provide functionality for dynamic capacity features.
+//!              Due to the nature of the free space list, it is difficult to
+//!             implement a shrink operation for memory copy, so shrinkand
+//!             extend are implemented by connecting the active node to the new
+//!             node buffer from the front.
+//! @todo       Implement heap based fslist
 template <typename nty_>
 class fslist_alloc_base
 {
@@ -111,10 +117,11 @@ protected:
         narray_[capacity_ - 1].nxt_ = NODE_NONE;
     }
 
-    //! @brief Allocate new node from memory pool
+    //! @brief
+    //!         Allocate new node from memory pool
     //! @details
-    //!      The node's links are returned unbroken, so the front and back
-    //!     links must be redirected.
+    //!          The node's links are returned unbroken, so the front and back
+    //!         links must be redirected.
     size_type alloc_node() noexcept
     {
         uassert( size_ < capacity_ );
@@ -125,9 +132,10 @@ protected:
         return n.cur_;
     }
 
-    //! @brief Insert new node at given location
-    //! @param i
-    //! @param at
+    //! @brief
+    //!         Insert new node at given location
+    //! @param  i
+    //! @param  at
     void insert_node( size_type i, size_type at ) noexcept
     {
         node_type& n = narray_[i];
@@ -158,8 +166,10 @@ protected:
         }
     }
 
-    //! @brief Unlink given node and put it back to memory pool.
-    //! @param i Node index to unlink
+    //! @brief
+    //!         Unlink given node and put it back to memory pool.
+    //! @param i
+    //!         Node index to unlink
     void dealloc_node( size_type i ) noexcept
     {
         auto& n = narray_[i];
@@ -190,10 +200,12 @@ protected:
         --size_;
     }
 
-    //! @brief Get front node index
+    //! @brief
+    //!         Get front node index
     size_type head() const noexcept { return head_; }
 
-    //! @brief Get last valid node index.
+    //! @brief
+    //!         Get last valid node index.
     size_type tail() const noexcept { return tail_; }
 
     size_type next( size_type n ) const noexcept { return narray_[n].nxt_; }
@@ -205,16 +217,17 @@ protected:
     }
 
 public:
-    //! @brief Get maximum number of nodes that can be held.
+    //! @brief  Get maximum number of nodes that can be held.
     size_type max_size() const noexcept { return capacity_; }
 
-    //! @brief Get number of spaces can insert new node
+    //! @brief
+    //!         Get number of spaces can insert new node
     size_type capacity() const noexcept { return capacity_ - size_; }
 
     //! @brief Get number of currently activated nodes
     size_type size() const noexcept { return size_; }
 
-    //! @brief Check if list is empty
+    //! @brief  Check if list is empty
     bool empty() const noexcept { return size_ == 0; }
 
     template <typename ty1_, typename ty_2>
@@ -230,7 +243,7 @@ private:
     node_type* narray_;
 };
 
-//! @brief list iterator definition
+//! @brief      list iterator definition
 template <typename dty_, typename nty_>
 class fslist_const_iterator
 {
@@ -277,7 +290,7 @@ private:
     friend class fslist_base;
 };
 
-//! @brief Modifiable list iterator
+//! @brief      Modifiable list iterator
 template <typename dty_, typename nty_>
 class fslist_iterator : public fslist_const_iterator<dty_, nty_>
 {
@@ -331,12 +344,12 @@ public:
     operator super() const noexcept { return static_cast<super&>( *this ); }
 };
 
-//! @brief Base class for list
+//! @brief      Base class for list
 //! @details
-//!      It provides an interface that can be used similar to a list of
-//!     common STL containers. Complex behaviors, such as nodes managed
-//!     by indexes, are simplified by implementing them in classes that
-//!     inherit them.
+//!              It provides an interface that can be used similar to a list of
+//!             common STL containers. Complex behaviors, such as nodes managed
+//!             by indexes, are simplified by implementing them in classes that
+//!             inherit them.
 template <typename dty_, typename nty_ = size_t>
 class fslist_base : public fslist_alloc_base<nty_>
 {

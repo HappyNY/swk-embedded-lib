@@ -10,9 +10,9 @@
 extern "C" {
 #endif
 
-//! @addtogroup uEmbedded_C
+//! @addtogroup     uEmbedded_C
 //! @{
-//! @defgroup uEmbedded_C_Timer_Logic
+//! @defgroup       uEmbedded_C_Timer_Logic
 //! @{
 
 struct timer_logic

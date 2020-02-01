@@ -10,20 +10,20 @@ extern "C" {
 
 //! @addtogroup uEmbedded_C
 //! @{
-//! @defgroup uEmbedded_C_Free_Space_List
-//! @brief Free space list
+//! @defgroup   uEmbedded_C_Free_Space_List
+//! @brief      Free space list
 //! @details
-//!     Free space lists have the same logic as normal lists. However, unlike a
-//!      normal list that allocates new memory each time a new node is created,
-//!      nodes in the free space list use memory from a preallocated memory
-//!      pool.
+//!              Free space lists have the same logic as normal lists. However,
+//!             unlike a normal list that allocates new memory each time a new
+//!             node is created, nodes in the free space list use memory from a
+//!             preallocated memory pool.
 //! @{
 #ifndef FSLIST_INDEX_TYPE
 #    define FSLIST_INDEX_TYPE uint16_t
 #endif
 
-//! \brief      16bit unsigned integer wil be used to indicate list node index.
-//! Therefore only 65535 nodes can be allocated for single list.
+//! \brief       16bit unsigned integer wil be used to indicate list node index.
+//!             Therefore only 65535 nodes can be allocated for single list.
 typedef FSLIST_INDEX_TYPE fslist_idx_t;
 
 //! \breif      Constant value that indicates invaid node index
@@ -87,10 +87,11 @@ enum
 };
 
 /*! \brief      Initiate node struct
-    \param      buff Buffer to be used internally. This memory chunk must be
-   valid during usage. After the deallocation of fslist, the finalization of
-   this memory chunk is up to the programmer. \param      buffSize Size of
-   passed buffer. \returns    Number of actual available nodes. */
+    \param      buff
+                 Buffer to be used internally. This memory chunk must be
+                valid during usage. After the deallocation of fslist, the
+   finalization of this memory chunk is up to the programmer. \param buffSize
+   Size of passed buffer. \returns    Number of actual available nodes. */
 size_t
 fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize );
 
@@ -127,10 +128,12 @@ fslist_prev( struct fslist* s, struct fslist_node* n )
 
 //! @brief Get data from node
 //! @details
-//!     Nodes in the free space list only specify indices. The data pointed to
-//!      by the node is calculated from the position of the node itself. If you
-//!      pass a copied node as an argument, incorrect behavior occurs.
-//! @param n: An original node instance which returned from functions
+//!              Nodes in the free space list only specify indices. The data
+//!             pointed to by the node is calculated from the position of the
+//!             node itself. If you pass a copied node as an argument, incorrect
+//!             behavior occurs.
+//! @param n
+//!             An original node instance which returned from functions
 static inline void* fslist_data( struct fslist* s, struct fslist_node const* n )
 {
     fslist_idx_t idx = fslist_idx( s, n );

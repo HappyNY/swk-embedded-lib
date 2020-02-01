@@ -6,8 +6,8 @@
 namespace upp {
 //! @addtogroup uEmbedded_Cpp
 //! @{
-//! @defgroup uEmbedded_Cpp_TimerLogic
-//! @brief Logical timer management class
+//! @defgroup   uEmbedded_Cpp_TimerLogic
+//! @brief      Logical timer management class
 //! @{
 
 using timer_cb_t = void ( * )( void* );
@@ -36,26 +36,29 @@ struct timer_logic_desc
     timer_cb_t cb_;
 };
 
-//! @brief Logical timer management class
+//! @brief      Logical timer management class
 //! @details
-//!      Regardless of hardware, it abstracts timer behavior logically. All
-//!     timer events are triggered by calling the timer's update () function,
-//!     and time information is obtained internally by the tick_function
-//!     callback. \n
-//!      The simplest implementation is to run a timer class with system time
-//!     using tick_type__ with a high resolution. \n
-//! @tparam tick_ty__ A data type that stores timer ticks. It must be in a
-//!     format that supports common arithmetic and comparison operations. \n
-//!      The timer does not have an instance of tick_ty__ internally and only
-//!     performs a time comparison with tick_function__.If you use tick_ty__
-//!     with a lower maximum, you can implement a timer by flexibly adjusting
-//!     the time origin.
-//! @tparam list_container__ @ref upp::impl::timer_logic_desc A dataset
-//!     with a list-type interface that stores it. \n
-//!      e.g. std::list<upp::impl::timer_logic_desc<tick_t>> \n
-//!      Because the timer uses only the standard list interface internally,
-//!     you can flexibly use any data structure that supports the insert()
-//!     function.
+//!              Regardless of hardware, it abstracts timer behavior logically.
+//!             All timer events are triggered by calling the timer's update ()
+//!             function, and time information is obtained internally by the
+//!             tick_function callback. \n
+//!              The simplest implementation is to run a timer class with system
+//!             time using tick_type__ with a high resolution. \n
+//! @tparam tick_ty__
+//!              A data type that stores timer ticks. It must be in a
+//!             format that supports common arithmetic and comparison
+//!             operations. \n
+//!              The timer does not have an instance of tick_ty__ internally and
+//!             only performs a time comparison with tick_function__.If you use
+//!             tick_ty__ with a lower maximum, you can implement a timer by
+//!             flexibly adjusting the time origin.
+//! @tparam list_container__
+//!              @ref upp::impl::timer_logic_desc A dataset with a list-type
+//!             interface that stores it. \n
+//!              e.g. std::list<upp::impl::timer_logic_desc<tick_t>> \n
+//!              Because the timer uses only the standard list interface
+//!             internally, you can flexibly use any data structure that
+//!             supports the insert() function.
 template <typename tick_ty__, typename list_container__>
 class timer_logic
 {
@@ -74,11 +77,15 @@ public:
         tick_ = std::forward<tick_fnc__>( v );
     }
 
-    //! @brief Add a timer instance
-    //! @param delay    Timer delay in timer tick dimension
-    //! @param obj      A object will be delivered with timer callback
-    //! @param callback Timer callback event.
-    //! @returns Timer handle of newly allocated timer instance.
+    //! @brief  Add a timer instance
+    //! @param delay
+    //!         Timer delay in timer tick dimension
+    //! @param obj
+    //!         A object will be delivered with timer callback
+    //! @param callback
+    //!         Timer callback event.
+    //! @returns
+    //!         Timer handle of newly allocated timer instance.
     handle_type add( tick_type delay, void* obj, timer_cb_t callback ) noexcept
     {
         uassert( tick_ );
@@ -102,7 +109,7 @@ public:
         return ret;
     }
 
-    //! @brief Removes allocated timer.
+    //! @brief      Removes allocated timer.
     bool remove( handle_type const& t ) noexcept
     {
         auto it = find_( t );
@@ -115,9 +122,10 @@ public:
         }
     }
 
-    //! @brief Get next trigger time
-    //! @returns the trigger time of the earliest element in the timer instance
-    //!     waiting for a trigger.
+    //! @brief      Get next trigger time
+    //! @returns
+    //!              the trigger time of the earliest element in the timer
+    //!             instance waiting for a trigger.
     tick_type next_trig() const noexcept
     {
         if ( empty() ) {
@@ -139,17 +147,18 @@ public:
         return true;
     }
 
-    //! @brief Update timer.
+    //! @brief      Update timer.
     //! @details
-    //!      It compares sequentially with the time returned by tick_function
-    //!     from the front of the active timer node. \n
-    //!      The timer node is always sorted, so even after performing an
-    //!     update, the timer node is always sorted. \n
-    //!      Also, it always performs a comparison with the frontmost element of
-    //!     the timer node, so it's safe to recursively assign new timers inside
-    //!     the timer event. \n
-    //! @warning Because it is not reentrant, ensure extra atomicity in a
-    //!     multi-threaded environment. 
+    //!              It compares sequentially with the time returned by
+    //!             tick_function from the front of the active timer node. \n
+    //!              The timer node is always sorted, so even after performing
+    //!             an update, the timer node is always sorted. \n
+    //!              Also, it always performs a comparison with the frontmost
+    //!             element of the timer node, so it's safe to recursively
+    //!             assign new timers inside the timer event. \n
+    //! @warning
+    //!              Because it is not reentrant, ensure extra atomicity in a
+    //!             multi-threaded environment.
     //! @returns @ref next_trig()
     tick_type update() noexcept
     {
@@ -166,16 +175,16 @@ public:
         return next_trig();
     }
 
-    //! @brief Clear all timer instances
+    //! @brief      Clear all timer instances
     void clear() noexcept { node_.clear(); }
 
-    //! @brief Get available space for new timer nodes
+    //! @brief      Get available space for new timer nodes
     size_t capacity() const noexcept { return node_.max_size() - node_.size(); }
 
-    //! @brief Get number of active timers
+    //! @brief      Get number of active timers
     size_t size() const noexcept { return node_.size(); }
 
-    //! @brief Check if timer node is empty.
+    //! @brief      Check if timer node is empty.
     bool empty() const noexcept { return node_.empty(); }
 
 private:

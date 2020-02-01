@@ -6,20 +6,26 @@
 extern "C" {
 #endif
 
-/*! @breif		Circular queue buffer.
-    @details
-        Since circular queue does not ensure a single memory chunk to be
-   continuous, the queue buffer provides peek operation as copying memory chunk
-   internally. Thus it can be extremely slow when peeking large memory chunks
-   repeatedly, It is recommended to use this functionality only for holding data
-   temporarily. This class differs from queue_allocator in terms of element
-   handling. queue_allocator makes an element distinguishable by wrapping it
-   with its size. On the other hand, this class works like a byte stream which
-   does not contain any information about the original element.
+//! @addtogroup uEmbedded_C
+//! @{
+//! @defgroup uEmbedded_C_RingBuffer
+//! @{
 
-    @warning
-        There is no safeguard for overflow to maximize embedded performance.
-*/
+//! @breif		Circular queue buffer.
+//! @details
+//!              Since circular queue does not ensure a single memory chunk to
+//!             be continuous, the queue buffer provides peek operation as
+//!             copying memory chunk internally. Thus it can be extremely slow
+//!             when peeking large memory chunks repeatedly, It is recommended
+//!             to use this functionality only for holding data temporarily.
+//!             This class differs from queue_allocator in terms of element
+//!             handling. queue_allocator makes an element distinguishable by
+//!             wrapping it with its size. On the other hand, this class works
+//!             like a byte stream which does not contain any information about
+//!             the original element.
+//! @note
+//!              There is no safeguard for overflow to maximize embedded
+//!             performance.
 struct ring_buffer
 {
     //!
@@ -64,6 +70,9 @@ static inline size_t ring_buffer_read( ring_buffer_t* s, void* b, size_t len )
     ring_buffer_consume( s, len );
     return len;
 }
+
+//! @}
+//! @}
 
 #ifdef __cplusplus
 }

@@ -35,8 +35,8 @@ struct transceiver_vtable
         *read )( void* /*obj*/, char* /*rdbuf*/, size_t /*rdcnt*/ );
 
     //! \brief      Tries write to transceiver. Must be non-block IO
-    //! \returns    Number of bytes written to transmit buffer. Otherwise 0 or
-    //! negative value to indicate the operation has failed.
+    //! \returns     Number of bytes written to transmit buffer. Otherwise 0 or
+    //!             negative value to indicate the operation has failed.
     transceiver_result_t (
         *write )( void* /*obj*/, char const* /*wrbuf*/, size_t /*wrcnt*/ );
 
@@ -56,15 +56,17 @@ typedef struct tranceiver_desc
     transceiver_vtable_t const* vt_;
 } * tr_desc_t__;
 
-/*! \brief      The base type of all transceiver implementations.
-    \details
-      This base type definition is recommended to be placed as the first member
-   of any struct that wants to implement a transceiver interface. Transceiver
-   functions take transceiver_base_t instance as arguments, and virtual
-   functions will be called by reinterpreting given arguments as the
-   implementation struct that its value starts with given transceiver instance's
-   address. Therefore, placing this base type at the mid of the other members
-   can make the rest of the development process confusing.*/
+//! \brief      The base type of all transceiver implementations.
+//! \details
+//!              This base type definition is recommended to be placed as the
+//!             first member of any struct that wants to implement a transceiver
+//!             interface. Transceiver functions take transceiver_base_t
+//!             instance as arguments, and virtual functions will be called by
+//!             reinterpreting given arguments as the implementation struct that
+//!             its value starts with given transceiver instance's address.
+//!             Therefore, placing this base type at the mid of the other
+//!             members can make the rest of the development process
+//!             confusing.
 typedef intptr_t transceiver_handle_t;
 
 //! Read data from the transceiver.
