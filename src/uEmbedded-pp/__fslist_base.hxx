@@ -53,9 +53,11 @@ struct fslist_node
     fslist_node<nty_>& next() { return by_( nxt_ ); }
 
 private:
+    //! \brief
+    //!         Calculate distance from given argument using offset
     fslist_node<nty_>& by_( int absolute )
     {
-        uassert( nxt_ != NODE_NONE && prv_ != NODE_NONE );
+        uassert( absolute != NODE_NONE ); //< What's this?
         return *( this + cur_ - absolute );
     }
 

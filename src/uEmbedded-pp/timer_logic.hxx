@@ -88,6 +88,7 @@ public:
     //!         Timer handle of newly allocated timer instance.
     handle_type add( tick_type delay, void* obj, timer_cb_t callback ) noexcept
     {
+        uassert( is_updating_ == false );
         uassert( tick_ );
         uassert( capacity() );
 
@@ -112,6 +113,7 @@ public:
     //! @brief      Removes allocated timer.
     bool remove( handle_type const& t ) noexcept
     {
+        uassert( is_updating_ == false );
         auto it = find_( t );
         if ( it != node_.end() ) {
             node_.erase( it );
@@ -160,6 +162,7 @@ public:
     //!              Because it is not reentrant, ensure extra atomicity in a
     //!             multi-threaded environment.
     //! @returns @ref next_trig()
+    //! \{
     tick_type update() noexcept
     {
         for ( auto it = node_.begin();
@@ -174,6 +177,35 @@ public:
 
         return next_trig();
     }
+    template <class callable_lock__, class callable_unlock__>
+    tick_type
+    update_lock( callable_lock__&& lock, callable_unlock__&& unlock ) noexcept
+    {
+        typename container_type::const_iterator it;
+
+        for ( ;; ) {
+            is_updating_ = true;
+            it           = node_.begin();
+
+            if ( it == node_.end() || it->trigger_at_ > tick_() ) {
+                break;
+            }
+
+            auto cb  = it->cb_;
+            auto obj = it->obj_;
+
+            lock();
+            node_.pop_front();
+            unlock();
+            is_updating_ = false;
+
+            cb( obj );
+        }
+
+        is_updating_ = false;
+        return next_trig();
+    }
+    //! \}
 
     //! @brief      Clear all timer instances
     void clear() noexcept { node_.clear(); }
@@ -200,6 +232,7 @@ private:
     }
 
 private:
+    volatile bool  is_updating_ = false;
     container_type node_;
     tick_fnc_type  tick_;
     tick_type      id_gen_ = 0;
