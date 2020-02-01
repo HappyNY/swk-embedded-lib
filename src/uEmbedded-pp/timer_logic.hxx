@@ -36,18 +36,18 @@ struct timer_logic_desc {
 //!      Regardless of hardware, it abstracts timer behavior logically. All
 //!     timer events are triggered by calling the timer's update () function,
 //!     and time information is obtained internally by the tick_function
-//!     callback.
+//!     callback. \n
 //!      The simplest implementation is to run a timer class with system time
-//!     using tick_type__ with a high resolution.
+//!     using tick_type__ with a high resolution. \n
 //! @tparam tick_ty__ A data type that stores timer ticks. It must be in a
-//!     format that supports common arithmetic and comparison operations.
+//!     format that supports common arithmetic and comparison operations. \n
 //!      The timer does not have an instance of tick_ty__ internally and only
 //!     performs a time comparison with tick_function__.If you use tick_ty__
 //!     with a lower maximum, you can implement a timer by flexibly adjusting
 //!     the time origin.
 //! @tparam list_container__ @ref upp::impl::timer_logic_desc A dataset
-//!     with a list-type interface that stores it.
-//!      e.g. std::list<upp::impl::timer_logic_desc<tick_t>>
+//!     with a list-type interface that stores it. \n
+//!      e.g. std::list<upp::impl::timer_logic_desc<tick_t>> \n
 //!      Because the timer uses only the standard list interface internally,
 //!     you can flexibly use any data structure that supports the insert()
 //!     function.
@@ -134,14 +134,14 @@ public:
     //! @brief Update timer.
     //! @details
     //!      It compares sequentially with the time returned by tick_function
-    //!     from the front of the active timer node.
+    //!     from the front of the active timer node. \n
     //!      The timer node is always sorted, so even after performing an
-    //!     update, the timer node is always sorted.
+    //!     update, the timer node is always sorted. \n
     //!      Also, it always performs a comparison with the frontmost element of
     //!     the timer node, so it's safe to recursively assign new timers inside
-    //!     the timer event.
+    //!     the timer event. \n
     //! @warning Because it is not reentrant, ensure extra atomicity in a
-    //!     multi-threaded environment.
+    //!     multi-threaded environment. 
     //! @returns @ref next_trig()
     tick_type update() noexcept
     {
