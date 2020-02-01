@@ -1,8 +1,8 @@
 #pragma once
-#include "../uEmbedded/uassert.h"
 #include <algorithm>
 #include <functional>
 #include <stdint.h>
+#include "../uEmbedded/uassert.h"
 namespace upp {
 //! @addtogroup uEmbedded_Cpp
 //! @{
@@ -11,12 +11,16 @@ namespace upp {
 //! @{
 
 using timer_cb_t = void ( * )( void* );
-enum { TIMER_INVALID = -1 };
+enum
+{
+    TIMER_INVALID = -1
+};
 
 namespace impl {
 
 template <typename tick_ty__>
-struct timer_handle {
+struct timer_handle
+{
     tick_ty__ id_;
     tick_ty__ time_;
 };
@@ -24,7 +28,8 @@ struct timer_handle {
 } // namespace impl
 
 template <typename tick_ty__>
-struct timer_logic_desc {
+struct timer_logic_desc
+{
     tick_ty__  id_;
     tick_ty__  trigger_at_;
     void*      obj_;
@@ -51,9 +56,9 @@ struct timer_logic_desc {
 //!      Because the timer uses only the standard list interface internally,
 //!     you can flexibly use any data structure that supports the insert()
 //!     function.
-template <typename tick_ty__,
-          typename list_container__>
-class timer_logic {
+template <typename tick_ty__, typename list_container__>
+class timer_logic
+{
 public:
     using desc_type      = timer_logic_desc<tick_ty__>;
     using tick_type      = tick_ty__;
@@ -64,7 +69,10 @@ public:
 public:
     tick_fnc_type const& tick_function() const noexcept { return tick_; }
     template <class tick_fnc__>
-    void tick_function( tick_fnc__&& v ) noexcept { tick_ = std::forward<tick_fnc__>( v ); }
+    void tick_function( tick_fnc__&& v ) noexcept
+    {
+        tick_ = std::forward<tick_fnc__>( v );
+    }
 
     //! @brief Add a timer instance
     //! @param delay    Timer delay in timer tick dimension
@@ -82,9 +90,7 @@ public:
         d.obj_        = obj;
         d.id_         = id_gen_++;
 
-        auto at = std::find_if(
-            node_.begin(), node_.end(),
-            [&d]( auto& a ) { return d.trigger_at_ < a.trigger_at_; } );
+        auto at = std::find_if( node_.begin(), node_.end(), [&d]( auto& a ) { return d.trigger_at_ < a.trigger_at_; } );
 
         node_.insert( at, d );
 
@@ -145,9 +151,7 @@ public:
     //! @returns @ref next_trig()
     tick_type update() noexcept
     {
-        for ( auto it = node_.begin();
-              it != node_.end() && it->trigger_at_ <= tick_();
-              it = node_.begin() ) {
+        for ( auto it = node_.begin(); it != node_.end() && it->trigger_at_ <= tick_(); it = node_.begin() ) {
             auto cb  = it->cb_;
             auto obj = it->obj_;
 
@@ -159,10 +163,7 @@ public:
     }
 
     //! @brief Clear all timer instances
-    void clear() noexcept
-    {
-        node_.clear();
-    }
+    void clear() noexcept { node_.clear(); }
 
     //! @brief Get available space for new timer nodes
     size_t capacity() const noexcept { return node_.max_size() - node_.size(); }
@@ -174,14 +175,11 @@ public:
     bool empty() const noexcept { return node_.empty(); }
 
 private:
-    typename container_type::const_iterator
-    find_( handle_type const& h ) const
+    typename container_type::const_iterator find_( handle_type const& h ) const
     {
         auto       beg = node_.cbegin();
         auto const end = node_.cend();
-        for ( ; beg != end
-                && h.time_ < beg->trigger_at_;
-              ++beg ) {
+        for ( ; beg != end && h.time_ < beg->trigger_at_; ++beg ) {
             if ( h.id_ == beg->id_ )
                 return beg;
         }

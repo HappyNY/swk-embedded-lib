@@ -1,9 +1,9 @@
 #pragma once
 
 #if __cplusplus < 201700L
-#include <experimental/optional>
+#    include <experimental/optional>
 #else
-#include <optional>
+#    include <optional>
 #endif
 
 #include <stdint.h>
@@ -44,7 +44,7 @@ inline const uint32_t fnv1a_32( const void* key )
 
     return hash;
 
-} //hash_32_fnv1a
+} // hash_32_fnv1a
 
 } // namespace hash
 

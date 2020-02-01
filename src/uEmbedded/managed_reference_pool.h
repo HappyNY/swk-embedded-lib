@@ -9,16 +9,20 @@
       objhandle ---> objnode ---> actual reference
  */
 #pragma once
-#include "fslist.h"
 #include <stdint.h>
 #include <stdlib.h>
+#include "fslist.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
-enum { OBJECTID_NULL = -1u };
+enum
+{
+    OBJECTID_NULL = -1u
+};
 
-typedef struct refhandle {
+typedef struct refhandle
+{
     struct managed_reference_pool** s;
     struct fslist_node*             node;
     uint32_t                        id;
@@ -33,10 +37,8 @@ size_t                    refpool_num_available( managed_reference_pool_t* s );
 //! \warning    This function invalidates all alive reference handles!
 void refpool_destroy( managed_reference_pool_t* s );
 
-typedef void ( *refpool_foreach_callback_t )( void* /*caller*/,
-                                              refhandle_t* /*iter_object*/ );
-void refpool_foreach( managed_reference_pool_t* s, void* caller,
-                      refpool_foreach_callback_t cb );
+typedef void ( *refpool_foreach_callback_t )( void* /*caller*/, refhandle_t* /*iter_object*/ );
+void refpool_foreach( managed_reference_pool_t* s, void* caller, refpool_foreach_callback_t cb );
 
 bool  ref_free( refhandle_t* h );
 void* ref_lock( refhandle_t* h );

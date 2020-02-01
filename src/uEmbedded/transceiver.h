@@ -12,7 +12,8 @@ extern "C" {
 typedef int32_t transceiver_result_t;
 
 /*! \brief          Types of transceiver results. */
-enum {
+enum
+{
     TRANSCEIVER_ZERO          = 0,
     TRANSCEIVER_OK            = 0,
     TRANSCEIVER_FAILED        = -1,
@@ -27,16 +28,15 @@ enum {
 };
 
 /*! \brief      Function table to imitate the inheritance feature. */
-struct transceiver_vtable {
+struct transceiver_vtable
+{
     //! \brief      This must be implemented as non-block IO
-    transceiver_result_t ( *read )( void* /*obj*/, char* /*rdbuf*/,
-                                    size_t /*rdcnt*/ );
+    transceiver_result_t ( *read )( void* /*obj*/, char* /*rdbuf*/, size_t /*rdcnt*/ );
 
     //! \brief      Tries write to transceiver. Must be non-block IO
     //! \returns    Number of bytes written to transmit buffer. Otherwise 0 or
     //! negative value to indicate the operation has failed.
-    transceiver_result_t ( *write )( void* /*obj*/, char const* /*wrbuf*/,
-                                     size_t /*wrcnt*/ );
+    transceiver_result_t ( *write )( void* /*obj*/, char const* /*wrbuf*/, size_t /*wrcnt*/ );
 
     //! Controls IO
     transceiver_result_t ( *ioctl )( void* /*obj*/, intptr_t /*cmd*/ );
@@ -49,7 +49,8 @@ struct transceiver_vtable {
 typedef struct transceiver_vtable transceiver_vtable_t;
 
 //! Actual transceiver desriptor type
-typedef struct tranceiver_desc {
+typedef struct tranceiver_desc
+{
     transceiver_vtable_t const* vt_;
 } * tr_desc_t__;
 

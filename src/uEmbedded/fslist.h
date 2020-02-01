@@ -1,8 +1,8 @@
 #pragma once
-#include "assert.h"
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdlib.h>
+#include "assert.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -27,11 +27,18 @@ extern "C" {
 typedef FSLIST_INDEX_TYPE fslist_idx_t;
 
 //! \breif      Constant value that indicates invaid node index
-enum { FSLIST_NODEIDX_NONE = (fslist_idx_t)-1 };
-enum { FSLIST_NUM_MAX_NODE = (fslist_idx_t)-1 };
+enum
+{
+    FSLIST_NODEIDX_NONE = (fslist_idx_t)-1
+};
+enum
+{
+    FSLIST_NUM_MAX_NODE = (fslist_idx_t)-1
+};
 
 //! \brief      Free space list.
-struct fslist {
+struct fslist
+{
     //! \brief      First reference of active node.
     fslist_idx_t head;
 
@@ -64,7 +71,8 @@ struct fslist {
 };
 
 //! \brief      List node struct.
-struct fslist_node {
+struct fslist_node
+{
     fslist_idx_t prev;
     fslist_idx_t next;
     //!         This variable will help to prevent mistakes
@@ -73,26 +81,26 @@ struct fslist_node {
     char padding[3];
 };
 
-enum { FSLIST_NODE_SIZE = sizeof( struct fslist_node ) };
+enum
+{
+    FSLIST_NODE_SIZE = sizeof( struct fslist_node )
+};
 
 /*! \brief      Initiate node struct
     \param      buff Buffer to be used internally. This memory chunk must be
    valid during usage. After the deallocation of fslist, the finalization of
    this memory chunk is up to the programmer. \param      buffSize Size of
    passed buffer. \returns    Number of actual available nodes. */
-size_t fslist_init( struct fslist* s, void* buff, size_t buffSize,
-                    size_t elemSize );
+size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize );
 
 /*! brief       Checks if given node is the node of given list s */
-static inline bool fslist_node_in_range( struct fslist const*      s,
-                                         struct fslist_node const* n )
+static inline bool fslist_node_in_range( struct fslist const* s, struct fslist_node const* n )
 {
     return n < s->get + s->capacity && s->get <= n;
 }
 
 /*! \brief      Get index of list node */
-static inline fslist_idx_t fslist_idx( struct fslist const*      s,
-                                       struct fslist_node const* n )
+static inline fslist_idx_t fslist_idx( struct fslist const* s, struct fslist_node const* n )
 {
     if ( !fslist_node_in_range( s, n ) )
         return FSLIST_NODEIDX_NONE;
@@ -101,30 +109,27 @@ static inline fslist_idx_t fslist_idx( struct fslist const*      s,
 }
 
 /*! \brief      Jump to next node */
-static inline struct fslist_node* fslist_next( struct fslist*      s,
-                                               struct fslist_node* n )
+static inline struct fslist_node* fslist_next( struct fslist* s, struct fslist_node* n )
 {
     return n->next != FSLIST_NODEIDX_NONE ? s->get + n->next : NULL;
 }
 
 /*! \brief      Jump to previous node. */
-static inline struct fslist_node* fslist_prev( struct fslist*      s,
-                                               struct fslist_node* n )
+static inline struct fslist_node* fslist_prev( struct fslist* s, struct fslist_node* n )
 {
     return n->prev != FSLIST_NODEIDX_NONE ? s->get + n->prev : NULL;
 }
 
 //! @brief Get data from node
 //! @details
-//!     Nodes in the free space list only specify indices. The data pointed to 
-//!      by the node is calculated from the position of the node itself. If you 
+//!     Nodes in the free space list only specify indices. The data pointed to
+//!      by the node is calculated from the position of the node itself. If you
 //!      pass a copied node as an argument, incorrect behavior occurs.
 //! @param n: An original node instance which returned from functions
 static inline void* fslist_data( struct fslist* s, struct fslist_node const* n )
 {
     fslist_idx_t idx = fslist_idx( s, n );
-    return idx != FSLIST_NODEIDX_NONE ? (void*)( s->data + ( idx * s->elemSize ) )
-                                      : NULL;
+    return idx != FSLIST_NODEIDX_NONE ? (void*)( s->data + ( idx * s->elemSize ) ) : NULL;
 }
 
 /*! \brief      Apply same process to all active nodes iteratively. */

@@ -7,16 +7,15 @@
 //! @details
 //!      This class implements thread-unsafe lightweight linked list
 #pragma once
-#include "../uEmbedded/uassert.h"
 #include <iterator>
 #include <new>
 #include <stdint.h>
 #include <stdlib.h>
 #include <string.h>
 #include <utility>
+#include "../uEmbedded/uassert.h"
 
-namespace upp {
-namespace impl {
+namespace upp { namespace impl {
 //! @addtogroup uEmbedded_Cpp
 //! @{
 //! @defgroup uEmbedded_Cpp_FreeSpaceList
@@ -36,8 +35,12 @@ namespace impl {
 //!      use this node class directly. If you need to access an element of a
 //!      list, use an iterator instead.
 template <typename nty_>
-struct fslist_node {
-    enum { NODE_NONE = (nty_)-1 };
+struct fslist_node
+{
+    enum
+    {
+        NODE_NONE = (nty_)-1
+    };
     nty_ nxt_;
     nty_ prv_;
 
@@ -69,29 +72,28 @@ private:
 //!     with STL containers and can be called externally through class
 //!     instances.
 //! @tparam nty_ \ref upp::impl::fslist_node
-//! @todo Provide functionality for dynamic capacity features. 
-//!     Due to the nature of the free space list, it is difficult to implement 
-//!     a shrink operation for memory copy, so shrinkand extend are implemented 
+//! @todo Provide functionality for dynamic capacity features.
+//!     Due to the nature of the free space list, it is difficult to implement
+//!     a shrink operation for memory copy, so shrinkand extend are implemented
 //!     by connecting the active node to the new node buffer from the front.
 //! @todo Implement heap based fslist
 template <typename nty_>
-class fslist_alloc_base {
+class fslist_alloc_base
+{
 protected:
     using size_type       = nty_;
     using difference_type = ptrdiff_t;
     using node_type       = fslist_node<size_type>;
-    enum { NODE_NONE = (size_type)-1 };
+    enum
+    {
+        NODE_NONE = (size_type)-1
+    };
 
     //! @brief Constructor of node management class
     //! @param capacity Given node array's capacity.
-    //! @param narray Provided node array 
-    fslist_alloc_base( size_type capacity, node_type* narray ) noexcept
-        : size_( 0 )
-        , capacity_( capacity )
-        , head_( NODE_NONE )
-        , tail_( NODE_NONE )
-        , idle_( 0 )
-        , narray_( narray )
+    //! @param narray Provided node array
+    fslist_alloc_base( size_type capacity, node_type* narray ) noexcept :
+        size_( 0 ), capacity_( capacity ), head_( NODE_NONE ), tail_( NODE_NONE ), idle_( 0 ), narray_( narray )
     {
         // Link all available nodes
         for ( size_t i = 0; i < capacity; i++ ) {
@@ -105,8 +107,8 @@ protected:
     }
 
     //! @brief Allocate new node from memory pool
-    //! @details 
-    //!      The node's links are returned unbroken, so the front and back 
+    //! @details
+    //!      The node's links are returned unbroken, so the front and back
     //!     links must be redirected.
     size_type alloc_node() noexcept
     {
@@ -119,8 +121,8 @@ protected:
     }
 
     //! @brief Insert new node at given location
-    //! @param i 
-    //! @param at 
+    //! @param i
+    //! @param at
     void insert_node( size_type i, size_type at ) noexcept
     {
         node_type& n = narray_[i];
@@ -205,7 +207,7 @@ public:
     size_type size() const noexcept { return size_; }
 
     //! @brief Check if list is empty
-    bool      empty() const noexcept { return size_ == 0; }
+    bool empty() const noexcept { return size_ == 0; }
 
     template <typename ty1_, typename ty_2>
     friend class fslist_const_iterator;
@@ -222,7 +224,8 @@ private:
 
 //! @brief list iterator definition
 template <typename dty_, typename nty_>
-class fslist_const_iterator {
+class fslist_const_iterator
+{
 public:
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type        = dty_;
@@ -231,7 +234,10 @@ public:
     using reference         = dty_ const&;
     using size_type         = nty_;
     using container_type    = fslist_alloc_base<nty_>;
-    enum { NODE_NONE = (size_type)-1 };
+    enum
+    {
+        NODE_NONE = (size_type)-1
+    };
 
     fslist_const_iterator<dty_, nty_>& operator++() noexcept;
     fslist_const_iterator<dty_, nty_>  operator++( int ) noexcept;
@@ -240,11 +246,17 @@ public:
     reference                          operator*() const noexcept;
     pointer                            operator->() const noexcept;
 
-    bool operator!=( const fslist_const_iterator<dty_, nty_>& r ) const noexcept { return r.container_ != container_ || r.cur_ != cur_; }
-    bool operator==( const fslist_const_iterator<dty_, nty_>& r ) const noexcept { return r.container_ == container_ && r.cur_ == cur_; }
+    bool operator!=( const fslist_const_iterator<dty_, nty_>& r ) const noexcept
+    {
+        return r.container_ != container_ || r.cur_ != cur_;
+    }
+    bool operator==( const fslist_const_iterator<dty_, nty_>& r ) const noexcept
+    {
+        return r.container_ == container_ && r.cur_ == cur_;
+    }
 
     bool valid() const noexcept { return container_->valid_node( cur_ ); }
-    operator bool() const noexcept { return valid(); }
+         operator bool() const noexcept { return valid(); }
 
     size_type fs_idx__() const noexcept { return cur_; }
 
@@ -259,7 +271,8 @@ private:
 
 //! @brief Modifiable list iterator
 template <typename dty_, typename nty_>
-class fslist_iterator : public fslist_const_iterator<dty_, nty_> {
+class fslist_iterator : public fslist_const_iterator<dty_, nty_>
+{
 public:
     using iterator_category = std::bidirectional_iterator_tag;
     using value_type        = dty_;
@@ -280,42 +293,30 @@ public:
         return ++r;
     }
 
-    fslist_iterator<dty_, nty_>& operator--() noexcept
-    {
-        return static_cast<fslist_iterator&>( super::operator--() );
-    }
-    fslist_iterator<dty_, nty_> operator--( int ) noexcept
+    fslist_iterator<dty_, nty_>& operator--() noexcept { return static_cast<fslist_iterator&>( super::operator--() ); }
+    fslist_iterator<dty_, nty_>  operator--( int ) noexcept
     {
         auto r = *this;
         return ++r;
     }
-    reference operator*() const noexcept
-    {
-        return const_cast<reference>( super::operator*() );
-    }
-    pointer operator->() const noexcept
-    {
-        return const_cast<pointer>( super::operator->() );
-    }
+    reference operator*() const noexcept { return const_cast<reference>( super::operator*() ); }
+    pointer   operator->() const noexcept { return const_cast<pointer>( super::operator->() ); }
 
     bool operator!=( fslist_iterator const& b ) const noexcept { return (super&)*this != (super&)b; }
     bool operator==( fslist_iterator const& b ) const noexcept { return (super&)*this == (super&)b; }
 
-    operator super() const noexcept
-    {
-        return static_cast<super&>( *this );
-    }
+    operator super() const noexcept { return static_cast<super&>( *this ); }
 };
 
 //! @brief Base class for list
-//! @details 
+//! @details
 //!      It provides an interface that can be used similar to a list of
-//!     common STL containers. Complex behaviors, such as nodes managed 
-//!     by indexes, are simplified by implementing them in classes that 
+//!     common STL containers. Complex behaviors, such as nodes managed
+//!     by indexes, are simplified by implementing them in classes that
 //!     inherit them.
-template <typename dty_,
-          typename nty_ = size_t>
-class fslist_base : public fslist_alloc_base<nty_> {
+template <typename dty_, typename nty_ = size_t>
+class fslist_base : public fslist_alloc_base<nty_>
+{
 public:
     using super_type      = fslist_alloc_base<nty_>;
     using value_type      = dty_;
@@ -329,13 +330,13 @@ public:
     using iterator        = fslist_iterator<value_type, size_type>;
     using const_iterator  = fslist_const_iterator<value_type, size_type>;
     using super           = fslist_alloc_base<nty_>;
-    enum { NODE_NONE = (size_type)-1 };
+    enum
+    {
+        NODE_NONE = (size_type)-1
+    };
 
 public:
-    ~fslist_base() noexcept
-    {
-        clear();
-    }
+    ~fslist_base() noexcept { clear(); }
 
     void clear() noexcept
     {
@@ -347,11 +348,9 @@ public:
         }
     }
 
-    fslist_base( size_type capacity, pointer varray, node_type* narray ) noexcept
-        : super_type( capacity, narray )
-        , varray_( varray )
-    {
-    }
+    fslist_base( size_type capacity, pointer varray, node_type* narray ) noexcept :
+        super_type( capacity, narray ), varray_( varray )
+    { }
 
     template <typename... arg_>
     reference emplace_front( arg_&&... args ) noexcept
@@ -371,15 +370,9 @@ public:
         return *p;
     }
 
-    void push_back( const_reference arg ) noexcept
-    {
-        emplace_back( arg );
-    }
+    void push_back( const_reference arg ) noexcept { emplace_back( arg ); }
 
-    void push_front( const_reference arg ) noexcept
-    {
-        emplace_front( arg );
-    }
+    void push_front( const_reference arg ) noexcept { emplace_front( arg ); }
 
     const_iterator cbegin() const noexcept
     {
@@ -447,10 +440,7 @@ public:
         return static_cast<iterator&>( r );
     }
 
-    iterator insert( const_iterator pos, const value_type& arg ) noexcept
-    {
-        return emplace( pos, arg );
-    }
+    iterator insert( const_iterator pos, const value_type& arg ) noexcept { return emplace( pos, arg ); }
 
     template <typename it_>
     iterator insert( const_iterator pos, it_ begin, it_ end ) noexcept
@@ -460,30 +450,18 @@ public:
         }
     }
 
-    void pop_back() noexcept
-    {
-        release( super::tail() );
-    }
+    void pop_back() noexcept { release( super::tail() ); }
 
-    void pop_front() noexcept
-    {
-        release( super::head() );
-    }
+    void pop_front() noexcept { release( super::head() ); }
 
-    void erase( const_iterator pos ) noexcept
-    {
-        release( pos.cur_ );
-    }
+    void erase( const_iterator pos ) noexcept { release( pos.cur_ ); }
 
     const_pointer at__( size_type fs_idx ) const noexcept
     {
         return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr;
     }
 
-    pointer at__( size_type fs_idx ) noexcept
-    {
-        return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr;
-    }
+    pointer at__( size_type fs_idx ) noexcept { return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr; }
 
 private:
     template <typename ty1_, typename ty2_>
@@ -543,14 +521,16 @@ inline fslist_const_iterator<dty_, nty_> fslist_const_iterator<dty_, nty_>::oper
 }
 
 template <typename dty_, typename nty_>
-inline typename fslist_const_iterator<dty_, nty_>::reference fslist_const_iterator<dty_, nty_>::operator*() const noexcept
+inline typename fslist_const_iterator<dty_, nty_>::reference
+fslist_const_iterator<dty_, nty_>::operator*() const noexcept
 {
     auto c = static_cast<fslist_base<dty_, nty_>*>( const_cast<fslist_alloc_base<nty_>*>( container_ ) );
     return *c->get_arg( cur_ );
 }
 
 template <typename dty_, typename nty_>
-inline typename fslist_const_iterator<dty_, nty_>::pointer fslist_const_iterator<dty_, nty_>::operator->() const noexcept
+inline typename fslist_const_iterator<dty_, nty_>::pointer
+fslist_const_iterator<dty_, nty_>::operator->() const noexcept
 {
     auto c = static_cast<fslist_base<dty_, nty_>*>( const_cast<fslist_alloc_base<nty_>*>( container_ ) );
     return c->get_arg( cur_ );
@@ -558,5 +538,4 @@ inline typename fslist_const_iterator<dty_, nty_>::pointer fslist_const_iterator
 
 //! @}
 //! @}
-};
-}; // namespace upp::impl
+}; }; // namespace upp::impl

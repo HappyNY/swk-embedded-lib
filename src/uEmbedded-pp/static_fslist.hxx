@@ -1,9 +1,10 @@
-#include "__fslist_base.hxx" 
+#include "__fslist_base.hxx"
 
 namespace upp {
 
 template <typename value_ty__, typename size_ty__, size_t cap__>
-class static_fslist : public impl::fslist_base<value_ty__, size_ty__> {
+class static_fslist : public impl::fslist_base<value_ty__, size_ty__>
+{
 public:
     using super           = impl::fslist_base<value_ty__, size_ty__>;
     using value_type      = value_ty__;
@@ -17,10 +18,7 @@ public:
     using const_iterator  = typename super::const_iterator;
 
 public:
-    static_fslist()
-        : super( cap__, &vbuf[0], &nbuf[0] )
-    {
-    }
+    static_fslist() : super( cap__, &vbuf[0], &nbuf[0] ) { }
 
 private:
     value_ty__                   vbuf[cap__];

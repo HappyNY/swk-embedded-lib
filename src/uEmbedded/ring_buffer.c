@@ -1,6 +1,6 @@
 #include "ring_buffer.h"
-#include "uassert.h"
 #include <stdlib.h>
+#include "uassert.h"
 
 void ring_buffer_init( ring_buffer_t* s, void* buff, size_t buffSz )
 {
