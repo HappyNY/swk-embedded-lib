@@ -27,7 +27,12 @@ size_t lowerbound(
     \returns Pointer to newly inserted item.
     \warning Maximum number of elements must be larger than numElems!
  */
-void* array_insert( void const* arr, void const* elem, size_t index, size_t elemSize, size_t* lpNumElems );
+void* array_insert(
+    void const* arr,
+    void const* elem,
+    size_t      index,
+    size_t      elemSize,
+    size_t*     lpNumElems );
 
 #ifdef __cplusplus
 }

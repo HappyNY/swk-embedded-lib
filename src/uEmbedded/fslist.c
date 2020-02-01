@@ -3,7 +3,8 @@
 
 typedef struct fslist_node node_t;
 
-size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize )
+size_t
+fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize )
 {
     size_t chunkSize = elemSize + sizeof( struct fslist_node );
     size_t it;

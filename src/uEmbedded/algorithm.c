@@ -39,7 +39,12 @@ size_t lowerbound(
     return idx;
 }
 
-void* array_insert( void const* arr, void const* elem, size_t index, size_t elemSize, size_t* lpNumElems )
+void* array_insert(
+    void const* arr,
+    void const* elem,
+    size_t      index,
+    size_t      elemSize,
+    size_t*     lpNumElems )
 {
     size_t numElems = *lpNumElems;
     uassert( arr && elemSize && index <= numElems );

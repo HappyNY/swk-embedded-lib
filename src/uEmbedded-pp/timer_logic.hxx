@@ -90,7 +90,9 @@ public:
         d.obj_        = obj;
         d.id_         = id_gen_++;
 
-        auto at = std::find_if( node_.begin(), node_.end(), [&d]( auto& a ) { return d.trigger_at_ < a.trigger_at_; } );
+        auto at = std::find_if( node_.begin(), node_.end(), [&d]( auto& a ) {
+            return d.trigger_at_ < a.trigger_at_;
+        } );
 
         node_.insert( at, d );
 
@@ -151,7 +153,9 @@ public:
     //! @returns @ref next_trig()
     tick_type update() noexcept
     {
-        for ( auto it = node_.begin(); it != node_.end() && it->trigger_at_ <= tick_(); it = node_.begin() ) {
+        for ( auto it = node_.begin();
+              it != node_.end() && it->trigger_at_ <= tick_();
+              it = node_.begin() ) {
             auto cb  = it->cb_;
             auto obj = it->obj_;
 

@@ -18,7 +18,10 @@ struct queue_allocator
 
 /*! \brief Initialize queue allcoator. Deinitiation of queue alloator can simply
  * be done by releasing memory on \ref queue_allocator::buff */
-void queue_allocator_init( struct queue_allocator* s, void* buff, size_t capacity );
+void queue_allocator_init(
+    struct queue_allocator* s,
+    void*                   buff,
+    size_t                  capacity );
 
 /*! \brief Push new data into queue.
     \details

@@ -77,7 +77,10 @@ void refpool_destroy( managed_reference_pool_t* s )
     free( s );
 }
 
-void refpool_foreach( managed_reference_pool_t* s, void* caller, refpool_foreach_callback_t cb )
+void refpool_foreach(
+    managed_reference_pool_t*  s,
+    void*                      caller,
+    refpool_foreach_callback_t cb )
 {
     uassert( s && cb );
 

@@ -18,7 +18,10 @@ struct delegate
     bool    bEraseLock;
 };
 
-void delegate_assign( delegate_t* s, refhandle_t const* objref, delegate_event_cb_t callback )
+void delegate_assign(
+    delegate_t*         s,
+    refhandle_t const*  objref,
+    delegate_event_cb_t callback )
 {
     uassert( s && callback && objref );
 
@@ -63,7 +66,10 @@ size_t delegate_size( delegate_t* s )
     return s->cnt;
 }
 
-size_t delegate_delete( delegate_t* s, refhandle_t const* objref, delegate_event_cb_t callback )
+size_t delegate_delete(
+    delegate_t*         s,
+    refhandle_t const*  objref,
+    delegate_event_cb_t callback )
 {
     uassert( s && objref );
     node_t* head = s->head;
@@ -75,7 +81,8 @@ size_t delegate_delete( delegate_t* s, refhandle_t const* objref, delegate_event
 
     for ( ; head; head = next ) {
         next = head->next;
-        if ( head->cb == callback && memcmp( &head->objref, objref, sizeof( *objref ) ) == 0 ) {
+        if ( head->cb == callback
+             && memcmp( &head->objref, objref, sizeof( *objref ) ) == 0 ) {
             if ( prev )
                 prev->next = next;
             else // if prev is null, means erasing node is the first node ...

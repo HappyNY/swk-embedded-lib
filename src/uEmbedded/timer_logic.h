@@ -49,7 +49,11 @@ typedef struct timer_logic_info timer_info_t;
 size_t timer_init( timer_logic_t* s, void* buff, size_t buffSize );
 
 //! \brief      Allocates new timer.
-timer_handle_t timer_add( timer_logic_t* s, size_t whenToTrigger, void ( *callback )( void* ), void* callbackObj );
+timer_handle_t timer_add(
+    timer_logic_t* s,
+    size_t         whenToTrigger,
+    void ( *callback )( void* ),
+    void* callbackObj );
 
 //! \brief      Update timer based on given time parameter.
 //! @returns    Next trigger time. -1 if there's no more timer to trigger.
@@ -62,11 +66,14 @@ static inline size_t timer_nextTrigger( timer_logic_t* s )
         return (size_t)-1;
     }
 
-    return ( (timer_info_t*)fslist_data( &s->nodes, s->nodes.get + s->nodes.head ) )->triggerTime;
+    return ( (timer_info_t*)
+                 fslist_data( &s->nodes, s->nodes.get + s->nodes.head ) )
+        ->triggerTime;
 }
 
 //! \brief      Browse timer handle
-static inline timer_info_t const* timer_browse( timer_logic_t* s, timer_handle_t h )
+static inline timer_info_t const*
+timer_browse( timer_logic_t* s, timer_handle_t h )
 {
     if ( h.n && h.n->isValid ) {
         timer_info_t* info = (timer_info_t*)fslist_data( &s->nodes, h.n );

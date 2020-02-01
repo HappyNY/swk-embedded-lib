@@ -91,16 +91,19 @@ enum
    valid during usage. After the deallocation of fslist, the finalization of
    this memory chunk is up to the programmer. \param      buffSize Size of
    passed buffer. \returns    Number of actual available nodes. */
-size_t fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize );
+size_t
+fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize );
 
 /*! brief       Checks if given node is the node of given list s */
-static inline bool fslist_node_in_range( struct fslist const* s, struct fslist_node const* n )
+static inline bool
+fslist_node_in_range( struct fslist const* s, struct fslist_node const* n )
 {
     return n < s->get + s->capacity && s->get <= n;
 }
 
 /*! \brief      Get index of list node */
-static inline fslist_idx_t fslist_idx( struct fslist const* s, struct fslist_node const* n )
+static inline fslist_idx_t
+fslist_idx( struct fslist const* s, struct fslist_node const* n )
 {
     if ( !fslist_node_in_range( s, n ) )
         return FSLIST_NODEIDX_NONE;
@@ -109,13 +112,15 @@ static inline fslist_idx_t fslist_idx( struct fslist const* s, struct fslist_nod
 }
 
 /*! \brief      Jump to next node */
-static inline struct fslist_node* fslist_next( struct fslist* s, struct fslist_node* n )
+static inline struct fslist_node*
+fslist_next( struct fslist* s, struct fslist_node* n )
 {
     return n->next != FSLIST_NODEIDX_NONE ? s->get + n->next : NULL;
 }
 
 /*! \brief      Jump to previous node. */
-static inline struct fslist_node* fslist_prev( struct fslist* s, struct fslist_node* n )
+static inline struct fslist_node*
+fslist_prev( struct fslist* s, struct fslist_node* n )
 {
     return n->prev != FSLIST_NODEIDX_NONE ? s->get + n->prev : NULL;
 }
@@ -129,11 +134,14 @@ static inline struct fslist_node* fslist_prev( struct fslist* s, struct fslist_n
 static inline void* fslist_data( struct fslist* s, struct fslist_node const* n )
 {
     fslist_idx_t idx = fslist_idx( s, n );
-    return idx != FSLIST_NODEIDX_NONE ? (void*)( s->data + ( idx * s->elemSize ) ) : NULL;
+    return idx != FSLIST_NODEIDX_NONE
+               ? (void*)( s->data + ( idx * s->elemSize ) )
+               : NULL;
 }
 
 /*! \brief      Apply same process to all active nodes iteratively. */
-static inline void fslist_forEach( struct fslist* s, void ( *callback )( void* ) )
+static inline void
+fslist_forEach( struct fslist* s, void ( *callback )( void* ) )
 {
     struct fslist_node* n;
 

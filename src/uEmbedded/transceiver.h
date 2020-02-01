@@ -31,12 +31,14 @@ enum
 struct transceiver_vtable
 {
     //! \brief      This must be implemented as non-block IO
-    transceiver_result_t ( *read )( void* /*obj*/, char* /*rdbuf*/, size_t /*rdcnt*/ );
+    transceiver_result_t (
+        *read )( void* /*obj*/, char* /*rdbuf*/, size_t /*rdcnt*/ );
 
     //! \brief      Tries write to transceiver. Must be non-block IO
     //! \returns    Number of bytes written to transmit buffer. Otherwise 0 or
     //! negative value to indicate the operation has failed.
-    transceiver_result_t ( *write )( void* /*obj*/, char const* /*wrbuf*/, size_t /*wrcnt*/ );
+    transceiver_result_t (
+        *write )( void* /*obj*/, char const* /*wrbuf*/, size_t /*wrcnt*/ );
 
     //! Controls IO
     transceiver_result_t ( *ioctl )( void* /*obj*/, intptr_t /*cmd*/ );
@@ -66,21 +68,24 @@ typedef struct tranceiver_desc
 typedef intptr_t transceiver_handle_t;
 
 //! Read data from the transceiver.
-static inline transceiver_result_t td_read( transceiver_handle_t desc, char* buf, size_t rdcnt )
+static inline transceiver_result_t
+td_read( transceiver_handle_t desc, char* buf, size_t rdcnt )
 {
     transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->read( (void*)desc, buf, rdcnt );
 }
 
 //! Write data into the transceiver
-static inline transceiver_result_t td_write( transceiver_handle_t desc, char* buf, size_t wrcnt )
+static inline transceiver_result_t
+td_write( transceiver_handle_t desc, char* buf, size_t wrcnt )
 {
     transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->write( (void*)desc, buf, wrcnt );
 }
 
 //! Deliever control command to transceiver
-static inline transceiver_result_t td_ioctl( transceiver_handle_t desc, intptr_t cmd )
+static inline transceiver_result_t
+td_ioctl( transceiver_handle_t desc, intptr_t cmd )
 {
     transceiver_vtable_t const* td = ( (tr_desc_t__)desc )->vt_;
     return td->ioctl( (void*)desc, cmd );

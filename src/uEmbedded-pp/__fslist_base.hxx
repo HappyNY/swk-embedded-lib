@@ -92,8 +92,13 @@ protected:
     //! @brief Constructor of node management class
     //! @param capacity Given node array's capacity.
     //! @param narray Provided node array
-    fslist_alloc_base( size_type capacity, node_type* narray ) noexcept :
-        size_( 0 ), capacity_( capacity ), head_( NODE_NONE ), tail_( NODE_NONE ), idle_( 0 ), narray_( narray )
+    fslist_alloc_base( size_type capacity, node_type* narray ) noexcept
+        : size_( 0 )
+        , capacity_( capacity )
+        , head_( NODE_NONE )
+        , tail_( NODE_NONE )
+        , idle_( 0 )
+        , narray_( narray )
     {
         // Link all available nodes
         for ( size_t i = 0; i < capacity; i++ ) {
@@ -194,7 +199,10 @@ protected:
     size_type next( size_type n ) const noexcept { return narray_[n].nxt_; }
     size_type prev( size_type n ) const noexcept { return narray_[n].prv_; }
 
-    bool valid_node( size_type n ) const noexcept { return n != NODE_NONE && narray_[n].cur_ != NODE_NONE; }
+    bool valid_node( size_type n ) const noexcept
+    {
+        return n != NODE_NONE && narray_[n].cur_ != NODE_NONE;
+    }
 
 public:
     //! @brief Get maximum number of nodes that can be held.
@@ -293,17 +301,32 @@ public:
         return ++r;
     }
 
-    fslist_iterator<dty_, nty_>& operator--() noexcept { return static_cast<fslist_iterator&>( super::operator--() ); }
-    fslist_iterator<dty_, nty_>  operator--( int ) noexcept
+    fslist_iterator<dty_, nty_>& operator--() noexcept
+    {
+        return static_cast<fslist_iterator&>( super::operator--() );
+    }
+    fslist_iterator<dty_, nty_> operator--( int ) noexcept
     {
         auto r = *this;
         return ++r;
     }
-    reference operator*() const noexcept { return const_cast<reference>( super::operator*() ); }
-    pointer   operator->() const noexcept { return const_cast<pointer>( super::operator->() ); }
+    reference operator*() const noexcept
+    {
+        return const_cast<reference>( super::operator*() );
+    }
+    pointer operator->() const noexcept
+    {
+        return const_cast<pointer>( super::operator->() );
+    }
 
-    bool operator!=( fslist_iterator const& b ) const noexcept { return (super&)*this != (super&)b; }
-    bool operator==( fslist_iterator const& b ) const noexcept { return (super&)*this == (super&)b; }
+    bool operator!=( fslist_iterator const& b ) const noexcept
+    {
+        return (super&)*this != (super&)b;
+    }
+    bool operator==( fslist_iterator const& b ) const noexcept
+    {
+        return (super&)*this == (super&)b;
+    }
 
     operator super() const noexcept { return static_cast<super&>( *this ); }
 };
@@ -348,8 +371,12 @@ public:
         }
     }
 
-    fslist_base( size_type capacity, pointer varray, node_type* narray ) noexcept :
-        super_type( capacity, narray ), varray_( varray )
+    fslist_base(
+        size_type  capacity,
+        pointer    varray,
+        node_type* narray ) noexcept
+        : super_type( capacity, narray )
+        , varray_( varray )
     { }
 
     template <typename... arg_>
@@ -357,7 +384,8 @@ public:
     {
         auto n = super::alloc_node();
         super::insert_node( n, super::head() );
-        auto p = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
+        auto p
+            = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
 
@@ -366,7 +394,8 @@ public:
     {
         auto n = super::alloc_node();
         super::insert_node( n, NODE_NONE );
-        auto p = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
+        auto p
+            = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
 
@@ -440,7 +469,10 @@ public:
         return static_cast<iterator&>( r );
     }
 
-    iterator insert( const_iterator pos, const value_type& arg ) noexcept { return emplace( pos, arg ); }
+    iterator insert( const_iterator pos, const value_type& arg ) noexcept
+    {
+        return emplace( pos, arg );
+    }
 
     template <typename it_>
     iterator insert( const_iterator pos, it_ begin, it_ end ) noexcept
@@ -461,7 +493,10 @@ public:
         return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr;
     }
 
-    pointer at__( size_type fs_idx ) noexcept { return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr; }
+    pointer at__( size_type fs_idx ) noexcept
+    {
+        return super::valid_node( fs_idx ) ? varray_ + fs_idx : nullptr;
+    }
 
 private:
     template <typename ty1_, typename ty2_>
@@ -486,7 +521,8 @@ private:
 };
 
 template <typename dty_, typename nty_>
-inline fslist_const_iterator<dty_, nty_>& fslist_const_iterator<dty_, nty_>::operator++() noexcept
+inline fslist_const_iterator<dty_, nty_>&
+fslist_const_iterator<dty_, nty_>::operator++() noexcept
 {
     uassert( container_ && cur_ != NODE_NONE );
     cur_ = container_->next( cur_ );
@@ -494,14 +530,16 @@ inline fslist_const_iterator<dty_, nty_>& fslist_const_iterator<dty_, nty_>::ope
 }
 
 template <typename dty_, typename nty_>
-inline fslist_const_iterator<dty_, nty_> fslist_const_iterator<dty_, nty_>::operator++( int ) noexcept
+inline fslist_const_iterator<dty_, nty_>
+fslist_const_iterator<dty_, nty_>::operator++( int ) noexcept
 {
     auto ret = *this;
     return ++ret;
 }
 
 template <typename dty_, typename nty_>
-inline fslist_const_iterator<dty_, nty_>& fslist_const_iterator<dty_, nty_>::operator--() noexcept
+inline fslist_const_iterator<dty_, nty_>&
+fslist_const_iterator<dty_, nty_>::operator--() noexcept
 {
     uassert( container_ && cur_ != container_.head() );
     if ( cur_ == NODE_NONE ) {
@@ -514,7 +552,8 @@ inline fslist_const_iterator<dty_, nty_>& fslist_const_iterator<dty_, nty_>::ope
 }
 
 template <typename dty_, typename nty_>
-inline fslist_const_iterator<dty_, nty_> fslist_const_iterator<dty_, nty_>::operator--( int ) noexcept
+inline fslist_const_iterator<dty_, nty_>
+fslist_const_iterator<dty_, nty_>::operator--( int ) noexcept
 {
     auto ret = *this;
     return --ret;
@@ -524,7 +563,8 @@ template <typename dty_, typename nty_>
 inline typename fslist_const_iterator<dty_, nty_>::reference
 fslist_const_iterator<dty_, nty_>::operator*() const noexcept
 {
-    auto c = static_cast<fslist_base<dty_, nty_>*>( const_cast<fslist_alloc_base<nty_>*>( container_ ) );
+    auto c = static_cast<fslist_base<dty_, nty_>*>(
+        const_cast<fslist_alloc_base<nty_>*>( container_ ) );
     return *c->get_arg( cur_ );
 }
 
@@ -532,7 +572,8 @@ template <typename dty_, typename nty_>
 inline typename fslist_const_iterator<dty_, nty_>::pointer
 fslist_const_iterator<dty_, nty_>::operator->() const noexcept
 {
-    auto c = static_cast<fslist_base<dty_, nty_>*>( const_cast<fslist_alloc_base<nty_>*>( container_ ) );
+    auto c = static_cast<fslist_base<dty_, nty_>*>(
+        const_cast<fslist_alloc_base<nty_>*>( container_ ) );
     return c->get_arg( cur_ );
 }
 
