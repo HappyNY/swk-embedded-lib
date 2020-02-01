@@ -2,7 +2,7 @@ extern "C"
 {
 #include "uEmbedded/queue_allocator.h"
 #include "uEmbedded/event-procedure.h"
-#include "uEmbedded/queue_buffer.h"
+#include "uEmbedded/ring_buffer.h"
 }
 #include <catch2/catch.hpp>
 #include <string>
