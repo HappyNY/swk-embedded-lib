@@ -1,7 +1,13 @@
 #include "__fslist_base.hxx"
 
 namespace upp {
+//! @addtogroup uEmbedded_Cpp
+//! @{
+//! @weakgroup  uEmbedded_Cpp_FreeSpaceList
+//! @{
 
+//! \brief       A simple wrapper class that allocates static memory for nodes
+//!             and data buffers.
 template <typename value_ty__, typename size_ty__, size_t cap__>
 class static_fslist : public impl::fslist_base<value_ty__, size_ty__>
 {
@@ -25,4 +31,6 @@ private:
     impl::fslist_node<size_ty__> nbuf[cap__];
 };
 
+//! @}
+//! @}
 } // namespace upp
