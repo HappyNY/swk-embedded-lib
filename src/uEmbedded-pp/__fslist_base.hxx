@@ -57,8 +57,9 @@ private:
     //!         Calculate distance from given argument using offset
     fslist_node<nty_>& by_( int absolute )
     {
-        uassert( absolute != NODE_NONE ); //< What's this?
-        return *( this + cur_ - absolute );
+        uassert( absolute != NODE_NONE );
+        uassert( cur_ != NODE_NONE );
+        return *( this - cur_ + absolute );
     }
 
     nty_ cur_;
@@ -97,15 +98,16 @@ protected:
         NODE_NONE = (size_type)-1
     };
 
-    //! @brief Constructor of node management class
-    //! @param capacity Given node array's capacity.
-    //! @param narray Provided node array
+    //! @brief      Constructor of node management class
+    //! @param      capacity Given node array's capacity.
+    //! @param      narray Provided node array
     fslist_alloc_base( size_type capacity, node_type* narray ) noexcept
         : size_( 0 )
         , capacity_( capacity )
         , head_( NODE_NONE )
         , tail_( NODE_NONE )
-        , idle_( 0 )
+        , idle_front_( 0 )
+        , idle_back_( capacity - 1 )
         , narray_( narray )
     {
         // Link all available nodes
@@ -119,59 +121,87 @@ protected:
         narray_[capacity_ - 1].nxt_ = NODE_NONE;
     }
 
-    //! @brief
-    //!         Allocate new node from memory pool
+    //! @brief      Insert new node at given location
+    //! @param      i
+    //! @param      at
+    void insert_node( size_type i, size_type at ) noexcept
+    {
+        node_type& n = narray_[i];
+        if ( at == NODE_NONE ) { // Insert at last
+            push_back_node( i );
+        }
+        else if ( at == head_ ) {
+            push_front_node( i );
+        }
+        else {
+            node_type& m = narray_[at];
+            uassert( n.cur_ != NODE_NONE );
+            uassert( m.cur_ != NODE_NONE );
+            uassert( m.prv_ != NODE_NONE );
+
+            m.prev().nxt_ = i;
+            n.prv_        = m.prv_;
+            m.prv_        = i;
+            n.nxt_        = at;
+        }
+    }
+
+    //! @brief      Append new node to backward
+    void push_back_node( size_type i ) noexcept
+    {
+        node_type& n = narray_[i];
+        uassert( n.cur_ != NODE_NONE );
+
+        if ( tail_ != NODE_NONE )
+            narray_[tail_].nxt_ = i;
+        else {
+            uassert( head_ == NODE_NONE );
+            head_ = i;
+        }
+
+        n.prv_ = tail_;
+        tail_  = i;
+    }
+
+    //! @brief      Insert front-most node
+    void push_front_node( size_type i ) noexcept
+    {
+        node_type& n = narray_[i];
+        uassert( n.cur_ != NODE_NONE );
+
+        if ( head_ != NODE_NONE )
+            narray_[head_].prv_ = i;
+        else {
+            uassert( tail_ == NODE_NONE );
+            tail_ = i;
+        }
+
+        n.nxt_ = head_;
+        head_  = i;
+    }
+
+    //! @brief      Allocate new node from memory pool
     //! @details
-    //!          The node's links are returned unbroken, so the front and back
-    //!         links must be redirected.
+    //!              The node's links are returned unbroken, so the front and
+    //!             back links must be redirected.
     size_type alloc_node() noexcept
     {
         uassert( size_ < capacity_ );
-        auto& n = narray_[idle_];
-        n.cur_  = idle_;
-        idle_   = n.nxt_;
+        auto& n     = narray_[idle_front_];
+        n.cur_      = idle_front_;
+        idle_front_ = n.nxt_;
+        if ( idle_front_ == NODE_NONE )
+            idle_back_ = NODE_NONE;
+        else
+            narray_[idle_front_].prv_ = NODE_NONE;
+        n.nxt_ = NODE_NONE;
+        n.prv_ = NODE_NONE;
         ++size_;
         return n.cur_;
     }
 
-    //! @brief
-    //!         Insert new node at given location
-    //! @param  i
-    //! @param  at
-    void insert_node( size_type i, size_type at ) noexcept
-    {
-        node_type& n = narray_[i];
-        uassert( n.cur_ != NODE_NONE );
-        if ( at == NODE_NONE ) {
-            n.nxt_ = NODE_NONE;
-            n.prv_ = tail_;
-            if ( tail_ != NODE_NONE ) {
-                narray_[tail_].nxt_ = i;
-            }
-            else { // tail is empty == head is empty
-                head_ = i;
-            }
-            tail_ = i;
-        }
-        else {
-            if ( at == head_ ) {
-                head_ = i;
-            }
-            node_type& n_at = narray_[at];
-            uassert( n_at.cur_ != NODE_NONE );
-            n.nxt_ = at;
-            n.prv_ = n_at.prv_;
-            if ( n_at.prv_ != NODE_NONE ) {
-                n_at.prev().nxt_ = i;
-            }
-            n_at.prv_ = i;
-        }
-    }
-
-    //! @brief
-    //!         Unlink given node and put it back to memory pool.
-    //! @param i
-    //!         Node index to unlink
+    //! @brief      Unlink given node and put it back to memory pool.
+    //! @param      i Node index to unlink
     void dealloc_node( size_type i ) noexcept
     {
         auto& n = narray_[i];
@@ -179,35 +209,37 @@ protected:
         uassert( i >= 0 && i < capacity_ );
 
         if ( n.nxt_ != NODE_NONE ) {
-            narray_[n.nxt_].prv_ = n.prv_;
+            n.next().prv_ = n.prv_;
         }
         else { // It's tail
             tail_ = n.prv_;
         }
 
         if ( n.prv_ != NODE_NONE ) {
-            narray_[n.prv_].nxt_ = n.nxt_;
+            n.prev().nxt_ = n.nxt_;
         }
         else { // It's head
             head_ = n.nxt_;
         }
 
-        if ( idle_ != NODE_NONE ) {
-            narray_[idle_].prv_ = i;
+        if ( idle_back_ != NODE_NONE ) {
+            narray_[idle_back_].nxt_ = i;
         }
-        n.prv_ = NODE_NONE;
-        n.cur_ = NODE_NONE;
-        n.nxt_ = idle_;
-        idle_  = i;
+        else {
+            uassert( idle_front_ == NODE_NONE );
+            idle_front_ = i;
+        }
+        n.prv_     = idle_back_;
+        n.nxt_     = NODE_NONE;
+        n.cur_     = NODE_NONE;
+        idle_back_ = i;
         --size_;
     }
 
-    //! @brief
-    //!         Get front node index
+    //! @brief      Get front node index
     size_type head() const noexcept { return head_; }
 
-    //! @brief
-    //!         Get last valid node index.
+    //! @brief      Get last valid node index.
     size_type tail() const noexcept { return tail_; }
 
     size_type next( size_type n ) const noexcept { return narray_[n].nxt_; }
@@ -219,29 +251,25 @@ protected:
     }
 
 public:
-    //! @brief  Get maximum number of nodes that can be held.
+    //! @brief      Get maximum number of nodes that can be held.
     size_type max_size() const noexcept { return capacity_; }
 
-    //! @brief
-    //!         Get number of spaces can insert new node
-    size_type capacity() const noexcept { return capacity_ - size_; }
-
-    //! @brief Get number of currently activated nodes
+    //! @brief      Get number of currently activated nodes
     size_type size() const noexcept { return size_; }
 
-    //! @brief  Check if list is empty
+    //! @brief      Check if list is empty
     bool empty() const noexcept { return size_ == 0; }
 
     template <typename ty1_, typename ty_2>
     friend class fslist_const_iterator;
 
 private:
-    size_type size_;
-    size_type capacity_;
-    size_type head_;
-    size_type tail_;
-
-    size_type  idle_;
+    size_type  size_;
+    size_type  capacity_;
+    size_type  head_;
+    size_type  tail_;
+    size_type  idle_front_;
+    size_type  idle_back_;
     node_type* narray_;
 };
 
@@ -387,20 +415,21 @@ public:
     }
 
     fslist_base(
-        size_type  capacity,
-        pointer    varray,
-        node_type* narray ) noexcept
+      size_type  capacity,
+      pointer    varray,
+      node_type* narray ) noexcept
         : super_type( capacity, narray )
         , varray_( varray )
-    { }
+    {
+    }
 
     template <typename... arg_>
     reference emplace_front( arg_&&... args ) noexcept
     {
         auto n = super::alloc_node();
-        super::insert_node( n, super::head() );
+        super::push_front_node( n );
         auto p
-            = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
+          = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
 
@@ -408,9 +437,9 @@ public:
     reference emplace_back( arg_&&... args ) noexcept
     {
         auto n = super::alloc_node();
-        super::insert_node( n, NODE_NONE );
+        super::push_back_node( n );
         auto p
-            = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
+          = new ( varray_ + n ) value_type( std::forward<arg_>( args )... );
         return *p;
     }
 
@@ -579,7 +608,7 @@ inline typename fslist_const_iterator<dty_, nty_>::reference
 fslist_const_iterator<dty_, nty_>::operator*() const noexcept
 {
     auto c = static_cast<fslist_base<dty_, nty_>*>(
-        const_cast<fslist_alloc_base<nty_>*>( container_ ) );
+      const_cast<fslist_alloc_base<nty_>*>( container_ ) );
     return *c->get_arg( cur_ );
 }
 
@@ -588,7 +617,7 @@ inline typename fslist_const_iterator<dty_, nty_>::pointer
 fslist_const_iterator<dty_, nty_>::operator->() const noexcept
 {
     auto c = static_cast<fslist_base<dty_, nty_>*>(
-        const_cast<fslist_alloc_base<nty_>*>( container_ ) );
+      const_cast<fslist_alloc_base<nty_>*>( container_ ) );
     return c->get_arg( cur_ );
 }
 

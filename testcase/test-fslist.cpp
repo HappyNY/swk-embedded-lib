@@ -12,7 +12,7 @@ TEST_CASE( "fslist functionalities.", "[fslist]" )
 {
     fslist v;
     size_t constexpr CAP = 32768;
-    size_t cnt           = fslist_init( &v, malloc( CAP ), CAP, sizeof( double ) );
+    size_t cnt = fslist_init( &v, malloc( CAP ), CAP, sizeof( double ) );
 
     REQUIRE( v.elemSize == sizeof( double ) );
 
@@ -79,7 +79,7 @@ TEST_CASE( "fslist Cplusplus version", "[fslist]" )
     }
 
     REQUIRE( f.size() == num_case );
-    REQUIRE( f.capacity() == 0 );
+    REQUIRE( f.max_size() - f.size() == 0 );
 
     for ( size_t i = 0; i < num_case / 2; i++ ) {
         f.pop_back();
@@ -91,10 +91,10 @@ TEST_CASE( "fslist Cplusplus version", "[fslist]" )
         f.emplace_front( rand() );
     }
 
-    REQUIRE( f.capacity() == 0 );
+    REQUIRE( f.max_size() - f.size() == 0 );
 
     f.clear();
-    REQUIRE(f.size() == 0);
+    REQUIRE( f.size() == 0 );
 
     std::vector<double> v;
 
