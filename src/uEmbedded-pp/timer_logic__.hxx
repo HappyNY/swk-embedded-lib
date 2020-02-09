@@ -224,7 +224,11 @@ private:
     {
         auto       beg = node_.cbegin();
         auto const end = node_.cend();
-        for ( ; beg != end && h.time_ < beg->trigger_at_; ++beg ) {
+
+        // In the find_ function, we use two elements to evaluate the handle
+        // passed as an argument; ID and trigger time. Time is useful for
+        // evaluating timer handles that have already been destroyed.
+        for ( ; beg != end && beg->trigger_at_ <= h.time_; ++beg ) {
             if ( h.id_ == beg->id_ )
                 return beg;
         }
