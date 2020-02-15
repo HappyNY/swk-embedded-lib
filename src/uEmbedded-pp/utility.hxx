@@ -65,8 +65,8 @@ static inline uint16_t byte_to_ascii( uint8_t const c )
     uint8_t const hi = c & 0xf;
 
     uint8_t ch[2];
-    ch[0] = ( lo ) + '0' + ( lo > 9 ) * ( 'a' - '0' );
-    ch[1] = ( hi ) + '0' + ( hi > 9 ) * ( 'a' - '0' );
+    ch[0] = ( lo ) + '0' + ( lo > 9 ) * ( 'a' - '0' - 10 );
+    ch[1] = ( hi ) + '0' + ( hi > 9 ) * ( 'a' - '0' - 10 );
 
     return *(uint16_t*)ch;
 }
@@ -79,10 +79,11 @@ static inline int ascii_to_byte( void const* c )
     uint8_t lo = ( (uint8_t const*)c )[1];
     hi         = hi - '0' - ( 'a' - '0' ) * ( hi >= 'a' );
     lo         = lo - '0' - ( 'a' - '0' ) * ( lo >= 'a' );
-    return ( hi << 4 ) + lo;
+    return ( hi << 4 ) + lo + 0xfffff * ( ( hi & ~0xf ) || ( lo & ~0xf ) );
 }
 } // namespace impl
-static void atob( void const* data, void* out, size_t outSize )
+
+static bool atob( void const* data, void* out, size_t outSize )
 {
     auto       head = reinterpret_cast<char*>( out );
     auto const end  = head + outSize;
@@ -90,18 +91,30 @@ static void atob( void const* data, void* out, size_t outSize )
     for ( ; head != end; ++head, data = (char*)data + 2 )
     {
         *head = impl::ascii_to_byte( data );
+
+        if ( ( *head & ~0xff ) != 0 )
+            return false;
     }
+    return true;
 }
 
-static void
+static size_t
 btoa( char* out, size_t capacity, void const* data, size_t dataSize )
 {
+    size_t written = 0;
+
     // Make even number
     for ( capacity -= ( capacity & 1 ); capacity && dataSize;
-          out += 2, capacity -= 2, data = (char*)data + 1, --dataSize )
+          out += 2,
+          capacity -= 2,
+          data = (char*)data + 1,
+          --dataSize,
+          ++written )
     {
         *(uint16_t*)out = impl::byte_to_ascii( *(uint8_t*)data );
     }
+
+    return written;
 }
 
 } // namespace binutil

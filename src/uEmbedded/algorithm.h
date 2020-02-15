@@ -39,30 +39,6 @@ void* array_insert(
   size_t      elemSize,
   size_t*     lpNumElems );
 
-//! @brief      Change single byte value into two ASCII characters
-static inline uint16_t byte_to_ascii( uint8_t const c )
-{
-    uint8_t const lo = c >> 4;
-    uint8_t const hi = c & 0xf;
-
-    uint8_t ch[2];
-    ch[0] = ( lo ) + '0' + ( lo > 9 ) * ( 'a' - '0' );
-    ch[1] = ( hi ) + '0' + ( hi > 9 ) * ( 'a' - '0' );
-
-    return *(uint16_t*)ch;
-}
-
-//! @brief      Change two ASCII characters into single byte.
-//! @returns    byte value between 0~255. Otherwise it's invalid ascii string
-static inline int ascii_to_byte( void const* c )
-{
-    uint8_t hi = ( (uint8_t const*)c )[0];
-    uint8_t lo = ( (uint8_t const*)c )[1];
-    hi         = hi - '0' - ( 'a' - '0' ) * ( hi >= 'a' );
-    lo         = lo - '0' - ( 'a' - '0' ) * ( lo >= 'a' );
-    return ( hi << 4 ) + lo;
-}
-
 //! @}
 //! @}
 #ifdef __cplusplus
