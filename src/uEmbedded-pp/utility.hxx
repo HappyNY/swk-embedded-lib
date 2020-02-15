@@ -22,24 +22,22 @@ constexpr uint64_t val_64_const   = 0xcbf29ce484222325;
 constexpr uint64_t prime_64_const = 0x100000001b3;
 
 inline constexpr uint32_t fnv1a_32_const(
-    const char* const str,
-    const uint32_t    value = val_32_const ) noexcept
+  const char* const str,
+  const uint32_t    value = val_32_const ) noexcept
 {
     return ( str[0] == '\0' )
-               ? value
-               : fnv1a_32_const(
-                   &str[1],
-                   ( value ^ uint32_t( str[0] ) ) * prime_32_const );
+             ? value
+             : fnv1a_32_const(
+               &str[1], ( value ^ uint32_t( str[0] ) ) * prime_32_const );
 }
 
 inline constexpr uint64_t
 fnv1a_64( const char* const str, const uint64_t value = val_64_const ) noexcept
 {
     return ( str[0] == '\0' )
-               ? value
-               : fnv1a_64(
-                   &str[1],
-                   ( value ^ uint64_t( str[0] ) ) * prime_64_const );
+             ? value
+             : fnv1a_64(
+               &str[1], ( value ^ uint64_t( str[0] ) ) * prime_64_const );
 }
 
 inline const uint32_t fnv1a_32( const void* key )
@@ -48,16 +46,65 @@ inline const uint32_t fnv1a_32( const void* key )
     uint32_t    hash  = 0x811c9dc5;
     uint32_t    prime = 0x1000193;
 
-    for ( ; *data; ++data ) {
+    for ( ; *data; ++data )
+    {
         hash = hash ^ *data;
         hash *= prime;
     }
 
     return hash;
-
-} // hash_32_fnv1a
-
+}
 } // namespace hash
+
+namespace binutil {
+namespace impl {
+//! @brief      Change single byte value into two ASCII characters
+static inline uint16_t byte_to_ascii( uint8_t const c )
+{
+    uint8_t const lo = c >> 4;
+    uint8_t const hi = c & 0xf;
+
+    uint8_t ch[2];
+    ch[0] = ( lo ) + '0' + ( lo > 9 ) * ( 'a' - '0' );
+    ch[1] = ( hi ) + '0' + ( hi > 9 ) * ( 'a' - '0' );
+
+    return *(uint16_t*)ch;
+}
+
+//! @brief      Change two ASCII characters into single byte.
+//! @returns    byte value between 0~255. Otherwise it's invalid ascii string
+static inline int ascii_to_byte( void const* c )
+{
+    uint8_t hi = ( (uint8_t const*)c )[0];
+    uint8_t lo = ( (uint8_t const*)c )[1];
+    hi         = hi - '0' - ( 'a' - '0' ) * ( hi >= 'a' );
+    lo         = lo - '0' - ( 'a' - '0' ) * ( lo >= 'a' );
+    return ( hi << 4 ) + lo;
+}
+} // namespace impl
+static void atob( void const* data, void* out, size_t outSize )
+{
+    auto       head = reinterpret_cast<char*>( out );
+    auto const end  = head + outSize;
+
+    for ( ; head != end; ++head, data = (char*)data + 2 )
+    {
+        *head = impl::ascii_to_byte( data );
+    }
+}
+
+static void
+btoa( char* out, size_t capacity, void const* data, size_t dataSize )
+{
+    // Make even number
+    for ( capacity -= ( capacity & 1 ); capacity && dataSize;
+          out += 2, capacity -= 2, data = (char*)data + 1, --dataSize )
+    {
+        *(uint16_t*)out = impl::byte_to_ascii( *(uint8_t*)data );
+    }
+}
+
+} // namespace binutil
 
 #if __cplusplus < 201700L
 template <class ty__>
