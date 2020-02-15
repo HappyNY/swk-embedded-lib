@@ -62,7 +62,33 @@ TEST_CASE( "Test lowerbound", "[algorithm]" )
     }
 }
 
-TEST_CASE( "Test btoa/atob", "[algorithm]" )
+template <typename ty__>
+bool TEST_TYPE( ty__ val )
+{
+    char buf[sizeof( ty__ ) * 2];
+    upp::binutil::btoa( buf, sizeof( buf ), &val, sizeof val );
+    ty__ other;
+    upp::binutil::atob( buf, &other, sizeof other );
+    INFO( val );
+    INFO( other );
+    return memcmp( &other, &val, sizeof other ) == 0;
+}
+
+TEST_CASE( "Test btoa/atob 1", "[algorithm]" )
+{
+    for ( size_t i = 0; i < 3043; i++ )
+    {
+        CHECK( TEST_TYPE( char( rand() ) ) );
+        CHECK( TEST_TYPE( uint8_t( rand() ) ) );
+        CHECK( TEST_TYPE( short( rand() ) ) );
+        CHECK( TEST_TYPE( long( rand() ) ) );
+        CHECK( TEST_TYPE( double( rand() ) ) );
+        CHECK( TEST_TYPE( float( rand() ) ) );
+        CHECK( TEST_TYPE( int( rand() ) ) );
+    }
+}
+
+TEST_CASE( "Test btoa/atob 2", "[algorithm]" )
 {
     struct big_mass_t
     {
