@@ -2,7 +2,7 @@
 
 struct uemb_lock
 {
-    void lock( void* );
-    void unlock( void* );
+    void  lock( void* );
+    void  unlock( void* );
     void* object;
 };

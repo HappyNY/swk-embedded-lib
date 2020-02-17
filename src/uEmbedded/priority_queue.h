@@ -4,7 +4,11 @@
 #include <stdlib.h>
 #include "uassert.h"
 
-//! \breif      Priority queue struct. Based on minimum heap. 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+//! \breif      Priority queue struct. Based on minimum heap.
 //! \warning    Not thread-safe!
 struct priority_queue
 {
@@ -20,7 +24,7 @@ struct priority_queue
     //! \breif
     size_t capacity;
 
-    //! \brief  
+    //! \brief
     char* buff;
 };
 
@@ -28,7 +32,12 @@ struct priority_queue
 typedef struct priority_queue pqueue_t;
 
 /*! \breif      Initialize new priority queue struct. */
-void pqueue_init( struct priority_queue* s, size_t elemSize, void* buff, size_t buffSize, int ( *pred )( void const*, void const* ) );
+void pqueue_init(
+    struct priority_queue* s,
+    size_t                 elemSize,
+    void*                  buff,
+    size_t                 buffSize,
+    int ( *pred )( void const*, void const* ) );
 
 /*! \breif      Push new element to queue. */
 void pqueue_push( struct priority_queue* s, void const* elem );
@@ -37,8 +46,12 @@ void pqueue_push( struct priority_queue* s, void const* elem );
 void pqueue_pop( struct priority_queue* s );
 
 /*! \breif      Peak next element.  */
-static inline void* pqueue_peek(struct priority_queue* s)
+static inline void* pqueue_peek( struct priority_queue* s )
 {
-    uassert(s && s->cnt);
+    uassert( s && s->cnt );
     return s->buff;
 }
+
+#ifdef __cplusplus
+}
+#endif

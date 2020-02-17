@@ -1,14 +1,29 @@
 #pragma once
-#include <stdint.h>
 #include <stdbool.h>
+#include <stdint.h>
 #include <stdlib.h>
 #include "assert.h"
 
-#ifndef FSLIST_INDEX_TYPE
-#define FSLIST_INDEX_TYPE uint32_t
+#ifdef __cplusplus
+extern "C" {
 #endif
 
-//! \brief      16bit unsigned integer wil be used to indicate list node index. Therefore only 65535 nodes can be allocated for single list.
+//! @addtogroup uEmbedded_C
+//! @{
+//! @defgroup   uEmbedded_C_Free_Space_List
+//! @brief      Free space list
+//! @details
+//!              Free space lists have the same logic as normal lists. However,
+//!             unlike a normal list that allocates new memory each time a new
+//!             node is created, nodes in the free space list use memory from a
+//!             preallocated memory pool.
+//! @{
+#ifndef FSLIST_INDEX_TYPE
+#    define FSLIST_INDEX_TYPE uint16_t
+#endif
+
+//! \brief       16bit unsigned integer wil be used to indicate list node index.
+//!             Therefore only 65535 nodes can be allocated for single list.
 typedef FSLIST_INDEX_TYPE fslist_idx_t;
 
 //! \breif      Constant value that indicates invaid node index
@@ -36,20 +51,23 @@ struct fslist
     //! \brief      Number of maximum nodes.
     fslist_idx_t capacity;
 
-    //! \brief      Active node count. Corresponds stl container's size() method.
+    //! \brief      Active node count. Corresponds stl container's size()
+    //! method.
     fslist_idx_t size;
 
     //! \brief      Size of single element. Can be any size.
     size_t elemSize;
 
-    //! \brief      Allocated memory for list. This must not be deallocated during list is active.
-    char *buff;
+    //! \brief      Allocated memory for list. This must not be deallocated
+    //! during list is active.
+    char* buff;
 
     //! \brief      Easy accessor for referencing nodes
-    struct fslist_node *get;
+    struct fslist_node* get;
 
-    //! \brief      Easy accessor for referencing element data. This member is for internal use !
-    char *data;
+    //! \brief      Easy accessor for referencing element data. This member is
+    //! for internal use !
+    char* data;
 };
 
 //! \brief      List node struct.
@@ -65,65 +83,88 @@ struct fslist_node
 
 enum
 {
-    FSLIST_NODE_SIZE = sizeof(struct fslist_node)
+    FSLIST_NODE_SIZE = sizeof( struct fslist_node )
 };
 
-/*! \brief      Initiate node struct 
-    \param      buff Buffer to be used internally. This memory chunk must be valid during usage. After the deallocation of fslist, the finalization of this memory chunk is up to the programmer. 
-    \param      buffSize Size of passed buffer.
-    \returns    Number of actual available nodes. */
+/*! \brief      Initiate node struct
+    \param      buff
+                 Buffer to be used internally. This memory chunk must be
+                valid during usage. After the deallocation of fslist, the
+   finalization of this memory chunk is up to the programmer. \param buffSize
+   Size of passed buffer. \returns    Number of actual available nodes. */
 size_t
-fslist_init(struct fslist *s, void *buff, size_t buffSize, size_t elemSize);
+fslist_init( struct fslist* s, void* buff, size_t buffSize, size_t elemSize );
 
 /*! brief       Checks if given node is the node of given list s */
-static inline bool fslist_node_in_range(struct fslist const *s, struct fslist_node const *n)
+static inline bool
+fslist_node_in_range( struct fslist const* s, struct fslist_node const* n )
 {
     return n < s->get + s->capacity && s->get <= n;
 }
 
 /*! \brief      Get index of list node */
-static inline fslist_idx_t fslist_idx(struct fslist const *s, struct fslist_node const *n)
+static inline fslist_idx_t
+fslist_idx( struct fslist const* s, struct fslist_node const* n )
 {
-    if (!fslist_node_in_range(s, n))
+    if ( !fslist_node_in_range( s, n ) )
         return FSLIST_NODEIDX_NONE;
     else
-        return (fslist_idx_t)(n - s->get);
+        return ( fslist_idx_t )( n - s->get );
 }
 
 /*! \brief      Jump to next node */
-static inline struct fslist_node *fslist_next(struct fslist *s, struct fslist_node *n)
+static inline struct fslist_node*
+fslist_next( struct fslist* s, struct fslist_node* n )
 {
     return n->next != FSLIST_NODEIDX_NONE ? s->get + n->next : NULL;
 }
 
 /*! \brief      Jump to previous node. */
-static inline struct fslist_node *fslist_prev(struct fslist *s, struct fslist_node *n)
+static inline struct fslist_node*
+fslist_prev( struct fslist* s, struct fslist_node* n )
 {
     return n->prev != FSLIST_NODEIDX_NONE ? s->get + n->prev : NULL;
 }
 
-/*! \brief      Get data from node 
-    \warning    This function is deprecated. */
-static inline void *fslist_data(struct fslist *s, struct fslist_node const *n)
+//! @brief Get data from node
+//! @details
+//!              Nodes in the free space list only specify indices. The data
+//!             pointed to by the node is calculated from the position of the
+//!             node itself. If you pass a copied node as an argument, incorrect
+//!             behavior occurs.
+//! @param n
+//!             An original node instance which returned from functions
+static inline void* fslist_data( struct fslist* s, struct fslist_node const* n )
 {
-    fslist_idx_t idx = fslist_idx(s, n);
-    return idx != FSLIST_NODEIDX_NONE ? (void *)(s->data + (idx * s->elemSize)) : NULL;
+    fslist_idx_t idx = fslist_idx( s, n );
+    return idx != FSLIST_NODEIDX_NONE
+               ? (void*)( s->data + ( idx * s->elemSize ) )
+               : NULL;
 }
 
 /*! \brief      Apply same process to all active nodes iteratively. */
-static inline void fslist_forEach(struct fslist *s, void (*callback)(void *))
+static inline void
+fslist_forEach( struct fslist* s, void ( *callback )( void* ) )
 {
-    struct fslist_node *n;
+    struct fslist_node* n;
 
-    if (s->size == 0)
+    if ( s->size == 0 )
         return;
 
-    for (n = s->get + s->head; n; n = fslist_next(s, n))
-        callback(fslist_data(s, n));
+    for ( n = s->get + s->head; n; n = fslist_next( s, n ) )
+        callback( fslist_data( s, n ) );
 }
 
-/*! \brief      Insert new node previous given node. Pass nullptr to push back. */
-struct fslist_node *fslist_insert(struct fslist *s, struct fslist_node *n);
+/*! \brief      Insert new node previous given node. Pass nullptr to push back.
+ */
+struct fslist_node* fslist_insert( struct fslist* s, struct fslist_node* n );
 
 /*! \brief      Remove given node from list. */
-void fslist_erase(struct fslist *s, struct fslist_node *n);
+void fslist_erase( struct fslist* s, struct fslist_node* n );
+
+//! @}
+//! @}
+
+#ifdef __cplusplus
+}
+#endif
