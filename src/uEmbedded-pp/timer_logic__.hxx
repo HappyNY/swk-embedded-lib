@@ -188,6 +188,7 @@ public:
             is_updating_ = true;
             it           = node_.begin();
             if ( it == node_.end() || it->trigger_at_ > tick_() ) {
+                is_updating_ = false;
                 unlock();
                 break;
             }
