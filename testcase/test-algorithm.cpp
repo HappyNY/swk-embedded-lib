@@ -18,7 +18,7 @@ TEST_CASE("Test lowerbound", "[algorithm]")
 
     enum
     {
-        numElem = 0x10000
+        numElem = 0x20
     };
     v.reserve(numElem);
 
