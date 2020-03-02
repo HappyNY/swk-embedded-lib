@@ -60,7 +60,7 @@ struct arithmatic_result
 
 template <typename t_0__, typename t_1__>
 using arith_result_t
-  = std::result_of_t<arithmatic_result<t_0__, t_1__>( void )>;
+  = std::invoke_result_t<arithmatic_result<t_0__, t_1__>( void )>;
 
 template <typename t_0__, typename t_1__>
 using add_result_t = arith_result_t<t_0__, t_1__>;

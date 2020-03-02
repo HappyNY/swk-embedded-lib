@@ -16,7 +16,8 @@ struct arithmetic_result
 };
 
 template <typename va, typename vb>
-using arithmetic_result_t = std::result_of_t<arithmetic_result<va, vb>( void )>;
+using arithmetic_result_t
+  = std::invoke_result_t<arithmetic_result<va, vb>( void )>;
 
 template <typename va, typename vb, size_t a, size_t b, size_t c>
 static dd<arithmetic_result_t<va, vb>, a, c>
@@ -29,6 +30,7 @@ TEST_CASE( "Matrix basic functionalities", "[math-matrix]" )
 {
     dd<int, 3, 4>   c;
     dd<float, 4, 5> f;
+    multiply( c, f );
 }
 
 TEST_CASE( "Matrix basic functionalities", "[math-matrix]" )
@@ -54,5 +56,5 @@ void nfunc( int a, int b )
 
     static_matrix<int, 4, 5> gg;
     static_matrix<int, 5, 4> kk;
-
+     
 }
