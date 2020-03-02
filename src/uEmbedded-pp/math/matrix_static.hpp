@@ -25,6 +25,9 @@ public:
     using cdesc_type = matrix_impl::cdesc<value_type>;
     using desc_type  = matrix_impl::desc<value_type>;
 
+    using iterator       = value_type*;
+    using const_iterator = value_type const*;
+
 public:
     desc_type desc() noexcept
     {
@@ -43,6 +46,11 @@ public:
         ret.dptr__ = data;
         return ret;
     }
+
+    iterator       begin() noexcept { return data; }
+    iterator       end() noexcept { return *( &data + 1 ); }
+    const_iterator cbegin() const noexcept { return data; }
+    const_iterator cend() const noexcept { return *( &data + 1 ); }
 
 public:
     static_matrix() = default;
@@ -117,6 +125,21 @@ public:
 private:
     value_type data[num_rows * num_cols];
 };
+
+//! @brief      Get identity matrix
+template <typename vty__, size_t r_>
+auto eye()
+{
+    static_matrix<vty__, r_, r_> out;
+
+    for ( size_t i = 0; i < out.num_rows; i++ ) {
+        for ( size_t j = 0; j < out.num_cols; j++ ) {
+            out( i, j ) = i == j;
+        }
+    }
+
+    return out;
+}
 
 //! @brief      Matrix Arithmetic Ops
 //! @details

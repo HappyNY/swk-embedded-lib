@@ -279,10 +279,10 @@ void substitute(
     UPP_MATRIX_COMMON_SINGULAR_END();
 }
 
-template <typename t_0__>
+template <typename t_0__, typename t_1__>
 void scalar_substitute(
   t_0__              r,
-  desc<t_0__> const& o,
+  desc<t_1__> const& o,
   size_t             capacity_out ) noexcept
 {
     using data_t = std::remove_reference_t<decltype( o )>::data_type;

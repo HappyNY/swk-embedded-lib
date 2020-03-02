@@ -1,6 +1,8 @@
 #pragma once
+#include <iostream>
 #include <string>
 #include "__matrix_base.hpp"
+#include "matrix_static.hpp"
 
 namespace std {
 
@@ -31,6 +33,13 @@ template <typename vty__>
 std::string to_string( upp::math::matrix_impl::desc<vty__> desc )
 {
     return to_string( upp::math::matrix_impl::cdesc<vty__>( desc ) );
+}
+
+template <typename vty__, size_t r_, size_t c_>
+std::ostream&
+operator<<( std::ostream& os, upp::math::static_matrix<vty__, r_, c_> const& r )
+{
+    return os << to_string( r.cdesc() );
 }
 
 } // namespace std
