@@ -1,6 +1,6 @@
 #pragma once
-#include "__matrix_base.hpp"
 #include <cstdlib>
+#include "__matrix_base.hpp"
 
 namespace upp { namespace math {
 //! @addtogroup uEmbedded_Cpp
@@ -15,7 +15,7 @@ template <typename vty__, size_t row__, size_t col__>
 class static_matrix
 {
 public:
-    enum
+    enum : size_t
     {
         num_rows = row__,
         num_cols = col__,
@@ -42,6 +42,36 @@ public:
         ret.row__  = num_rows;
         ret.dptr__ = data;
         return ret;
+    }
+
+public:
+    static_matrix() = default;
+
+    template <typename ty__>
+    static_matrix&
+    operator=( const static_matrix<ty__, num_rows, num_cols>& right )
+    {
+        matrix_impl::substitute( right.cdesc(), desc(), mat_size );
+        return *this;
+    }
+
+    template <typename ty__>
+    static_matrix( const static_matrix<ty__, num_rows, num_cols>& right )
+    {
+        *this = right;
+    }
+
+    template <typename ty__>
+    static_matrix& operator=( const ty__& value )
+    {
+        matrix_impl::scalar_substitute( value, desc(), mat_size );
+        return *this;
+    }
+
+    template <typename ty__>
+    static_matrix( const ty__& value )
+    {
+        *this = value;
     }
 
 public:
@@ -88,9 +118,124 @@ private:
     value_type data[num_rows * num_cols];
 };
 
+//! @brief      Matrix Arithmetic Ops
+//! @details
+//!             ^ operator indicates element-wise multiply operation.
+//!             ~ operator indicates transpose operation.
+//! @{
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator+(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::add( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator+(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  vty_b__ const&                        rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::scalar_add( lh.cdesc(), rh, out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator-(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::subtract( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator-(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  vty_b__ const&                        rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::scalar_add( lh.cdesc(), -rh, out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator^(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::elem_multiply(
+      lh.cdesc(),
+      rh.cdesc(),
+      out.desc(),
+      out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator/(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::elem_divide(
+      lh.cdesc(),
+      rh.cdesc(),
+      out.desc(),
+      out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator/(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  vty_b__ const&                        rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::scalar_divide( lh.cdesc(), rh, out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator/(
+  vty_b__ const&                        rh,
+  static_matrix<vty_a__, m_, n_> const& lh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::scalar_divide_by_mat(
+      lh.cdesc(),
+      rh,
+      out.desc(),
+      out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator*(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  vty_b__ const&                        rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::scalar_multiply( lh.cdesc(), rh, out.desc(), out.mat_size );
+    return out;
+}
+//
+// template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+// auto operator*(
+//  vty_b__ const&                        rh,
+//  static_matrix<vty_a__, m_, n_> const& lh ) noexcept
+//{
+//    return lh * rh;
+//}
+
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_, size_t l_>
-static static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, l_>
-operator*(
+auto operator*(
   static_matrix<vty_a__, m_, n_> const& lh,
   static_matrix<vty_b__, n_, l_> const& rh ) noexcept
 {
@@ -100,22 +245,115 @@ operator*(
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-static static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> operator+(
+auto operator==(
   static_matrix<vty_a__, m_, n_> const& lh,
   static_matrix<vty_b__, m_, n_> const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
-    matrix_impl::add( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::equals( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
-//! @brief      Scalar Ops
-//! @{
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator==(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  vty_b__ const&                        rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::scalar_equals( lh.cdesc(), rh, out.desc(), out.mat_size );
+    return out;
+}
 
-//! @todo Matrix operator + with scalar
-//! @todo Matrix operator - with scalar
-//! @todo Matrix operator * with scalar
-//! @todo Matrix operator / with scalar
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator!=(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::not_equals( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator!=(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  vty_b__ const&                        rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::scalar_neq( lh.cdesc(), rh, out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator>(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::greater_than(
+      lh.cdesc(),
+      rh.cdesc(),
+      out.desc(),
+      out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator>(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  vty_b__ const&                        rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::scalar_gt( lh.cdesc(), rh, out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator>=(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::greater_or_equal(
+      lh.cdesc(),
+      rh.cdesc(),
+      out.desc(),
+      out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator<(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::less_than( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator<=(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::less_or_equal(
+      lh.cdesc(),
+      rh.cdesc(),
+      out.desc(),
+      out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator!( static_matrix<vty_a__, m_, n_> const& lh ) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::not( lh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
 //! @}
 
 //! @}

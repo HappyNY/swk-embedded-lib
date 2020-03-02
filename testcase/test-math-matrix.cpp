@@ -28,13 +28,6 @@ multiply( dd<va, a, b> g1, dd<vb, b, c> g2 )
 
 TEST_CASE( "Matrix basic functionalities", "[math-matrix]" )
 {
-    dd<int, 3, 4>   c;
-    dd<float, 4, 5> f;
-    multiply( c, f );
-}
-
-TEST_CASE( "Matrix basic functionalities", "[math-matrix]" )
-{
     using namespace upp::math;
     using namespace std;
 
@@ -47,14 +40,6 @@ TEST_CASE( "Matrix basic functionalities", "[math-matrix]" )
     gg( 1, 1 ) = 6;
     gg( 2, 2 ) = 7;
     gg( 0, 0 ) = 7;
-}
 
-void nfunc( int a, int b )
-{
-    using namespace upp::math;
-    using namespace std;
-
-    static_matrix<int, 4, 5> gg;
-    static_matrix<int, 5, 4> kk;
-     
+    gg = gg * gg;
 }

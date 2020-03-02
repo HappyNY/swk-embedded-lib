@@ -58,9 +58,14 @@ struct arithmatic_result
     auto operator()() { return t_0__() + t_1__(); }
 };
 
+#ifdef __INTELLISENSE__
 template <typename t_0__, typename t_1__>
 using arith_result_t
   = std::invoke_result_t<arithmatic_result<t_0__, t_1__>( void )>;
+#else
+template <typename t_0__, typename t_1__>
+using arith_result_t = std::invoke_result_t<arithmatic_result<t_0__, t_1__>>;
+#endif
 
 template <typename t_0__, typename t_1__>
 using add_result_t = arith_result_t<t_0__, t_1__>;
@@ -117,7 +122,6 @@ using divide_result_t = arith_result_t<t_0__, t_1__>;
                                                                                \
     for ( size_t i = 0; i < rows; i++ ) {                                      \
         auto lptr = l.dptr__ + i * cols;                                       \
-        auto rptr = r.dptr__ + i * cols;                                       \
         auto optr = o.dptr__ + i * cols;                                       \
         for ( size_t j = 0; j < cols; j++ ) {
 #define UPP_MATRIX_COMMON_SINGULAR_END()                                       \
@@ -126,10 +130,10 @@ using divide_result_t = arith_result_t<t_0__, t_1__>;
 
 template <typename t_0__, typename t_1__>
 void add(
-  cdesc<t_0__> const&               l,
-  cdesc<t_1__> const&               r,
-  desc<add_result_t<t_0__, t_1__>>& o,
-  size_t                            capacity_out ) noexcept
+  cdesc<t_0__> const&                     l,
+  cdesc<t_1__> const&                     r,
+  desc<add_result_t<t_0__, t_1__>> const& o,
+  size_t                                  capacity_out ) noexcept
 {
     UPP_MATH_MATRIX_COMMON_BEGIN();
     optr[j] = lptr[j] + rptr[j];
@@ -138,10 +142,10 @@ void add(
 
 template <typename t_0__, typename t_1__>
 void subtract(
-  cdesc<t_0__> const&                    l,
-  cdesc<t_1__> const&                    r,
-  desc<subtract_result_t<t_0__, t_1__>>& o,
-  size_t                                 capacity_out ) noexcept
+  cdesc<t_0__> const&                          l,
+  cdesc<t_1__> const&                          r,
+  desc<subtract_result_t<t_0__, t_1__>> const& o,
+  size_t                                       capacity_out ) noexcept
 {
     UPP_MATH_MATRIX_COMMON_BEGIN();
     optr[j] = lptr[j] - rptr[j];
@@ -150,10 +154,10 @@ void subtract(
 
 template <typename t_0__, typename t_1__>
 void multiply(
-  cdesc<t_0__> const&                    l,
-  cdesc<t_1__> const&                    r,
-  desc<multiply_result_t<t_0__, t_1__>>& o,
-  size_t                                 capacity_out ) noexcept
+  cdesc<t_0__> const&                          l,
+  cdesc<t_1__> const&                          r,
+  desc<multiply_result_t<t_0__, t_1__>> const& o,
+  size_t                                       capacity_out ) noexcept
 {
     // m x n * n x l = m x l
     using data_t = std::remove_reference_t<decltype( o )>::data_type;
@@ -183,10 +187,10 @@ void multiply(
 
 template <typename t_0__, typename t_1__>
 void elem_multiply(
-  cdesc<t_0__> const&                    l,
-  cdesc<t_1__> const&                    r,
-  desc<multiply_result_t<t_0__, t_1__>>& o,
-  size_t                                 capacity_out ) noexcept
+  cdesc<t_0__> const&                          l,
+  cdesc<t_1__> const&                          r,
+  desc<multiply_result_t<t_0__, t_1__>> const& o,
+  size_t                                       capacity_out ) noexcept
 {
     UPP_MATH_MATRIX_COMMON_BEGIN();
     optr[j] = lptr[j] * rptr[j];
@@ -195,10 +199,10 @@ void elem_multiply(
 
 template <typename t_0__, typename t_1__>
 void elem_divide(
-  cdesc<t_0__> const&                  l,
-  cdesc<t_1__> const&                  r,
-  desc<divide_result_t<t_0__, t_1__>>& o,
-  size_t                               capacity_out ) noexcept
+  cdesc<t_0__> const&                        l,
+  cdesc<t_1__> const&                        r,
+  desc<divide_result_t<t_0__, t_1__>> const& o,
+  size_t                                     capacity_out ) noexcept
 {
     UPP_MATH_MATRIX_COMMON_BEGIN();
     optr[j] = lptr[j] / rptr[j];
@@ -207,10 +211,10 @@ void elem_divide(
 
 template <typename t_0__, typename t_1__>
 void scalar_multiply(
-  cdesc<t_0__> const&                    l,
-  t_1__                                  r,
-  desc<multiply_result_t<t_0__, t_1__>>& o,
-  size_t                                 capacity_out ) noexcept
+  cdesc<t_0__> const&                          l,
+  t_1__ const&                                 r,
+  desc<multiply_result_t<t_0__, t_1__>> const& o,
+  size_t                                       capacity_out ) noexcept
 {
     UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
     optr[j] = lptr[j] * r;
@@ -219,10 +223,10 @@ void scalar_multiply(
 
 template <typename t_0__, typename t_1__>
 void scalar_divide_by_mat(
-  cdesc<t_0__> const&                    l,
-  t_1__                                  r,
-  desc<multiply_result_t<t_0__, t_1__>>& o,
-  size_t                                 capacity_out ) noexcept
+  cdesc<t_0__> const&                          l,
+  t_1__ const&                                 r,
+  desc<multiply_result_t<t_0__, t_1__>> const& o,
+  size_t                                       capacity_out ) noexcept
 {
     UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
     optr[j] = r / lptr[j];
@@ -230,11 +234,23 @@ void scalar_divide_by_mat(
 }
 
 template <typename t_0__, typename t_1__>
+void scalar_divide(
+  cdesc<t_0__> const&                          l,
+  t_1__ const&                                 r,
+  desc<multiply_result_t<t_0__, t_1__>> const& o,
+  size_t                                       capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
+    optr[j] = lptr[j] / r;
+    UPP_MATH_MATRIX_COMMON_SCALAR_END();
+}
+
+template <typename t_0__, typename t_1__>
 void scalar_add(
-  cdesc<t_0__> const&                    l,
-  t_1__                                  r,
-  desc<multiply_result_t<t_0__, t_1__>>& o,
-  size_t                                 capacity_out ) noexcept
+  cdesc<t_0__> const&                          l,
+  t_1__ const&                                 r,
+  desc<multiply_result_t<t_0__, t_1__>> const& o,
+  size_t                                       capacity_out ) noexcept
 {
     UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
     optr[j] = lptr[j] + r;
@@ -249,6 +265,48 @@ void negate(
 {
     UPP_MATRIX_COMMON_SINGULAR_BEGIN();
     optr[j] = -lptr[j];
+    UPP_MATRIX_COMMON_SINGULAR_END();
+}
+
+template <typename t_0__, typename t_1__>
+void substitute(
+  cdesc<t_0__> const& l,
+  desc<t_1__>&        o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATRIX_COMMON_SINGULAR_BEGIN();
+    optr[j] = lptr[j];
+    UPP_MATRIX_COMMON_SINGULAR_END();
+}
+
+template <typename t_0__>
+void scalar_substitute(
+  t_0__              r,
+  desc<t_0__> const& o,
+  size_t             capacity_out ) noexcept
+{
+    using data_t = std::remove_reference_t<decltype( o )>::data_type;
+    uassert( capacity_out == o.col__ * o.row__ * sizeof( data_t ) );
+
+    auto rows = o.col__;
+    auto cols = o.row__;
+
+    for ( size_t i = 0; i < rows; i++ ) {
+        auto optr = o.dptr__ + i * cols;
+        for ( size_t j = 0; j < cols; j++ ) {
+            optr[j] = r;
+        }
+    }
+}
+
+template <typename t_0__>
+void transpose(
+  cdesc<t_0__> const& l,
+  desc<t_0__>&        o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATRIX_COMMON_SINGULAR_BEGIN();
+    optr[j] = o.dptr__[j * o.col__ + i];
     UPP_MATRIX_COMMON_SINGULAR_END();
 }
 
@@ -327,13 +385,113 @@ void greater_or_equal(
     UPP_MATH_MATRIX_COMMON_END();
 }
 
+template <typename t_0__, typename t_1__>
+void logic_and(
+  cdesc<t_0__> const& l,
+  cdesc<t_1__> const& r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_BEGIN();
+    optr[j] = lptr[j] && rptr[j];
+    UPP_MATH_MATRIX_COMMON_END();
+}
+
+template <typename t_0__, typename t_1__>
+void logic_or(
+  cdesc<t_0__> const& l,
+  cdesc<t_1__> const& r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_BEGIN();
+    optr[j] = lptr[j] || rptr[j];
+    UPP_MATH_MATRIX_COMMON_END();
+}
+
 template <typename t_0__>
-void not( cdesc<t_0__> const& l, desc<bool>& o, size_t capacity_out ) noexcept
+void not(
+  cdesc<t_0__> const& l,
+  desc<bool> const&   o,
+  size_t              capacity_out ) noexcept
 {
     UPP_MATRIX_COMMON_SINGULAR_BEGIN();
     optr[j] = !lptr[j];
     UPP_MATRIX_COMMON_SINGULAR_END();
 }
+
+template <typename t_0__, typename t_1__>
+void scalar_equals(
+  cdesc<t_0__> const& l,
+  t_1__ const&        r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
+    optr[j] = lptr[j] == r;
+    UPP_MATH_MATRIX_COMMON_SCALAR_END();
+}
+
+template <typename t_0__, typename t_1__>
+void scalar_neq(
+  cdesc<t_0__> const& l,
+  t_1__ const&        r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
+    optr[j] = lptr[j] != r;
+    UPP_MATH_MATRIX_COMMON_SCALAR_END();
+}
+
+template <typename t_0__, typename t_1__>
+void scalar_lt(
+  cdesc<t_0__> const& l,
+  t_1__ const&        r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
+    optr[j] = lptr[j] < r;
+    UPP_MATH_MATRIX_COMMON_SCALAR_END();
+}
+
+template <typename t_0__, typename t_1__>
+void scalar_gt(
+  cdesc<t_0__> const& l,
+  t_1__ const&        r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
+    optr[j] = lptr[j] >= r;
+    UPP_MATH_MATRIX_COMMON_SCALAR_END();
+}
+
+template <typename t_0__, typename t_1__>
+void scalar_lteq(
+  cdesc<t_0__> const& l,
+  t_1__ const&        r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
+    optr[j] = lptr[j] <= r;
+    UPP_MATH_MATRIX_COMMON_SCALAR_END();
+}
+
+template <typename t_0__, typename t_1__>
+void scalar_gteq(
+  cdesc<t_0__> const& l,
+  t_1__ const&        r,
+  desc<bool>&         o,
+  size_t              capacity_out ) noexcept
+{
+    UPP_MATH_MATRIX_COMMON_SCALAR_BEGIN();
+    optr[j] = lptr[j] >= r;
+    UPP_MATH_MATRIX_COMMON_SCALAR_END();
+}
+
 //! @}
 
 //! @}
