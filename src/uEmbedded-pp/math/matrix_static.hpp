@@ -1,5 +1,6 @@
 #pragma once
 #include "__matrix_base.hpp"
+#include <cstdlib>
 
 namespace upp { namespace math {
 //! @addtogroup uEmbedded_Cpp
