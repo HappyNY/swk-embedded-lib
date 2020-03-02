@@ -267,6 +267,28 @@ auto operator*(
     return out;
 }
 
+// Logical operations
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator&&(
+    static_matrix<vty_a__, m_, n_> const& lh,
+    static_matrix<vty_b__, m_, n_> const& rh) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::logic_and(lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size);
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+auto operator||(
+    static_matrix<vty_a__, m_, n_> const& lh,
+    static_matrix<vty_b__, m_, n_> const& rh) noexcept
+{
+    static_matrix<bool, m_, n_> out;
+    matrix_impl::logic_or(lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size);
+    return out;
+}
+
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
 auto operator==(
   static_matrix<vty_a__, m_, n_> const& lh,
@@ -285,7 +307,7 @@ auto operator==(
     static_matrix<bool, m_, n_> out;
     matrix_impl::scalar_equals( lh.cdesc(), rh, out.desc(), out.mat_size );
     return out;
-}
+} 
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
 auto operator!=(
