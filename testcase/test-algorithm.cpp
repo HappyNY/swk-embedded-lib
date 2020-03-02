@@ -1,6 +1,7 @@
 #include <Catch2/catch.hpp>
 #include <vector>
 #include <random>
+#include <uEmbedded-pp/math/matrix_static.hpp>
 extern "C"
 {
 #include "uEmbedded/algorithm.h"
@@ -45,5 +46,5 @@ TEST_CASE("Test lowerbound", "[algorithm]")
                               [](auto a, auto b) -> int { auto v = *( double*) a - *( double*) b; return v < 0 ? -1 : v > 0 ? 1 : 0; });
 
         REQUIRE(org == idx);
-    }
+    } 
 }

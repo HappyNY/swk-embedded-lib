@@ -6,15 +6,16 @@
 TEST_CASE( "Matrix basic functionalities", "[math-matrix]" )
 {
     using namespace upp::math;
+    using namespace std;
 
-    static_matrix<int, 4, 3> ff = {}, gg = {};
+    static_matrix<int, 3, 3> ff = {}, gg = {};
 
-    ff( 1 ) = 3;
-    ff( 2 ) = 4;
-    gg( 1 ) = 6;
-    gg( 3 ) = 7;
+    ff( 0, 0 ) = 3;
+    ff( 1, 1 ) = 3;
+    ff( 2, 2 ) = 4;
+    gg( 1, 1 ) = 6;
+    gg( 2, 2 ) = 7;
+    gg( 0, 0 ) = 7;
 
-    auto cc = ff + gg;
-
-    std::cout << std::to_string( cc.desc() ) << std::endl;
+    cout << to_string( ( ff * gg ).cdesc() ) << endl;
 }

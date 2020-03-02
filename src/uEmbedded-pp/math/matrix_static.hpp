@@ -83,83 +83,34 @@ public:
         return ret;
     }
 
-public:
-    //! @brief      Arithmetic operators
-    //! @details
-    //!             Multiply/Divide operations will be treated as element-wise.
-    //! @{
-
-    //! @brief      Addition
-    template <typename ty__>
-    auto operator+( static_matrix<ty__, num_rows, num_cols> const& rh ) noexcept
-    {
-        static_matrix<
-          matrix_impl::add_result_t<value_type, ty__>,
-          num_rows,
-          num_cols>
-          out;
-        matrix_impl::add( cdesc(), rh.cdesc(), out.desc(), mat_size );
-        return out;
-    }
-
-    //! @brief      Subtraction
-    template <typename ty__>
-    auto operator-( static_matrix<ty__, num_rows, num_cols> const& rh ) noexcept
-    {
-        static_matrix<
-          matrix_impl::subtract_result_t<value_type, ty__>,
-          num_rows,
-          num_cols>
-          out;
-        matrix_impl::subtract( cdesc(), rh.cdesc(), out.desc(), mat_size );
-        return out;
-    }
-
-    template <typename ty__, size_t o_col__>
-    auto operator*( static_matrix<ty__, num_cols, o_col__> const& rh ) noexcept
-    {
-        static_matrix<
-          matrix_impl::multiply_result_t<value_type, ty__>,
-          num_rows,
-          o_col__>
-          out;
-        matrix_impl::multiply( cdesc(), rh.cdesc(), out.desc(), mat_size );
-        return out;
-    }
-
-    //! @brief      Element-wise multiplication
-    template <typename ty__>
-    auto operator^( static_matrix<ty__, num_rows, num_cols> const& rh ) noexcept
-    {
-        static_matrix<
-          matrix_impl::multiply_result_t<value_type, ty__>,
-          num_rows,
-          num_cols>
-          out;
-        matrix_impl::elem_multiply( cdesc(), rh.cdesc(), out.desc(), mat_size );
-        return out;
-    }
-
-    //! @brief      Element-wise division
-    template <typename ty__>
-    auto operator/( static_matrix<ty__, num_rows, num_cols> const& rh ) noexcept
-    {
-        static_matrix<
-          matrix_impl::divide_result_t<value_type, ty__>,
-          num_rows,
-          num_cols>
-          out;
-        matrix_impl::elem_divide( cdesc(), rh.cdesc(), out.desc(), mat_size );
-        return out;
-    }
-
-    //! @}
 private:
     value_type data[num_rows * num_cols];
 };
 
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_, size_t l_>
+static static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, l_>
+operator*(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, n_, l_> const& rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, l_> out;
+    matrix_impl::multiply( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+static static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> operator+(
+  static_matrix<vty_a__, m_, n_> const& lh,
+  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+{
+    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix_impl::add( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
 //! @brief      Scalar Ops
 //! @{
+
 //! @todo Matrix operator + with scalar
 //! @todo Matrix operator - with scalar
 //! @todo Matrix operator * with scalar
