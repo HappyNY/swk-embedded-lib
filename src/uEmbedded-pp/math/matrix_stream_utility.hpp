@@ -36,6 +36,12 @@ std::string to_string( upp::math::matrix_impl::desc<vty__> desc )
 }
 
 template <typename vty__, size_t r_, size_t c_>
+std::string to_string( upp::math::static_matrix<vty__, r_, c_> const& r )
+{
+    return to_string( r.cdesc() );
+}
+
+template <typename vty__, size_t r_, size_t c_>
 std::ostream&
 operator<<( std::ostream& os, upp::math::static_matrix<vty__, r_, c_> const& r )
 {
