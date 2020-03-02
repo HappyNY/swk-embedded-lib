@@ -13,7 +13,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <utility>
-#include "../uEmbedded/uassert.h"
+#include "uassert.h"
 
 namespace upp { namespace impl {
 //! @addtogroup uEmbedded_Cpp

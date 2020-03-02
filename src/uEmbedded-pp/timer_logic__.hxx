@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <functional>
 #include <stdint.h>
-#include "../uEmbedded/uassert.h"
+#include "uassert.h"
 namespace upp {
 //! @addtogroup uEmbedded_Cpp
 //! @{
