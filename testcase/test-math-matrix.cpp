@@ -31,14 +31,14 @@ TEST_CASE( "Matrix basic functionalities", "[math-matrix]" )
     using namespace upp::math;
     using namespace std;
 
-    static_matrix<float, 3, 3> ff = {};
-    auto                       gg = eye<double, 3>();
+    matrix<float, 2, 4> ff = {};
+    auto                gg = eye<double, 3>(); 
 
     for ( auto& d : ff ) {
-        d = rand() / (double)RAND_MAX;
+        d = rand() / (float)RAND_MAX;
     }
 
-    cout << ff << endl << ff * gg << endl;
-    cout << ( ff ^ ( ff && gg ) ) << endl;
-    cout << ( ff == ( ff ^ ( ff && gg ) ) ) << endl;
+    cout << ff << endl;
+    cout << ~ff << endl;
+    cout << ( ff + ff ) << endl;
 }

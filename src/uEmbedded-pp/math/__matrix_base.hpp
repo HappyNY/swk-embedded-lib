@@ -85,8 +85,8 @@ using divide_result_t = arith_result_t<t_0__, t_1__>;
     uassert( l.col__ == r.col__ && r.col__ == o.col__ );                       \
     uassert( capacity_out == o.col__ * o.row__ * sizeof( data_t ) );           \
                                                                                \
-    auto rows = o.col__;                                                       \
-    auto cols = o.row__;                                                       \
+    auto rows = o.row__;                                                       \
+    auto cols = o.col__;                                                       \
                                                                                \
     for ( size_t i = 0; i < rows; i++ ) {                                      \
         auto lptr = l.dptr__ + i * cols;                                       \
@@ -114,11 +114,11 @@ using divide_result_t = arith_result_t<t_0__, t_1__>;
 
 #define UPP_MATRIX_COMMON_SINGULAR_BEGIN()                                     \
     using data_t = std::remove_reference_t<decltype( o )>::data_type;          \
-    uassert( l.row__ == o.row__ && l.col__ == o.col__ );                       \
+    uassert( l.row__ == o.col__ && l.col__ == o.row__ );                       \
     uassert( capacity_out == o.col__ * o.row__ * sizeof( data_t ) );           \
                                                                                \
-    auto rows = o.col__;                                                       \
-    auto cols = o.row__;                                                       \
+    auto rows = o.row__;                                                       \
+    auto cols = o.col__;                                                       \
                                                                                \
     for ( size_t i = 0; i < rows; i++ ) {                                      \
         auto lptr = l.dptr__ + i * cols;                                       \
@@ -294,7 +294,7 @@ void scalar_substitute(
     for ( size_t i = 0; i < rows; i++ ) {
         auto optr = o.dptr__ + i * cols;
         for ( size_t j = 0; j < cols; j++ ) {
-            optr[j] = r;
+            optr[j] = static_cast<data_t>( r );
         }
     }
 }
@@ -306,7 +306,7 @@ void transpose(
   size_t              capacity_out ) noexcept
 {
     UPP_MATRIX_COMMON_SINGULAR_BEGIN();
-    optr[j] = o.dptr__[j * o.col__ + i];
+    optr[j] = l.dptr__[j * l.col__ + i];
     UPP_MATRIX_COMMON_SINGULAR_END();
 }
 

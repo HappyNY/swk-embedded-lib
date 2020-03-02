@@ -12,7 +12,7 @@ namespace upp { namespace math {
 
 //! @brief      Supports for easy-to-use arithmetic operations
 template <typename vty__, size_t row__, size_t col__>
-class static_matrix
+class matrix
 {
 public:
     enum : size_t
@@ -47,37 +47,39 @@ public:
         return ret;
     }
 
+    operator cdesc_type() const noexcept { return cdesc(); }
+    operator desc_type() noexcept { return desc(); }
+
     iterator       begin() noexcept { return data; }
     iterator       end() noexcept { return *( &data + 1 ); }
-    const_iterator cbegin() const noexcept { return data; }
-    const_iterator cend() const noexcept { return *( &data + 1 ); }
+    const_iterator begin() const noexcept { return data; }
+    const_iterator end() const noexcept { return *( &data + 1 ); }
 
 public:
-    static_matrix() = default;
+    matrix() = default;
 
     template <typename ty__>
-    static_matrix&
-    operator=( const static_matrix<ty__, num_rows, num_cols>& right )
+    matrix& operator=( const matrix<ty__, num_rows, num_cols>& right )
     {
         matrix_impl::substitute( right.cdesc(), desc(), mat_size );
         return *this;
     }
 
     template <typename ty__>
-    static_matrix( const static_matrix<ty__, num_rows, num_cols>& right )
+    matrix( const matrix<ty__, num_rows, num_cols>& right )
     {
         *this = right;
     }
 
     template <typename ty__>
-    static_matrix& operator=( const ty__& value )
+    matrix& operator=( const ty__& value )
     {
         matrix_impl::scalar_substitute( value, desc(), mat_size );
         return *this;
     }
 
     template <typename ty__>
-    static_matrix( const ty__& value )
+    matrix( const ty__& value )
     {
         *this = value;
     }
@@ -103,7 +105,7 @@ public:
     auto row( size_t row ) const noexcept
     {
         uassert( row < num_rows );
-        static_matrix<value_type, 1, num_cols> ret;
+        matrix<value_type, 1, num_cols> ret;
         memcpy( ret.data, data + row * num_cols, ret.mat_size );
         return ret;
     }
@@ -111,7 +113,7 @@ public:
     auto col( size_t col ) const noexcept
     {
         uassert( col < num_cols );
-        static_matrix<value_type, num_rows, 1> ret;
+        matrix<value_type, num_rows, 1> ret;
 
         auto begin = data + col;
         for ( size_t i = 0; i < num_rows; i++ ) {
@@ -122,6 +124,15 @@ public:
         return ret;
     }
 
+    operator bool() const noexcept
+    {
+        bool bNonZero = false;
+        for ( auto& i : *this ) {
+            bNonZero = bNonZero || i != value_type();
+        }
+        return bNonZero;
+    }
+
 private:
     value_type data[num_rows * num_cols];
 };
@@ -130,7 +141,7 @@ private:
 template <typename vty__, size_t r_>
 auto eye()
 {
-    static_matrix<vty__, r_, r_> out;
+    matrix<vty__, r_, r_> out;
 
     for ( size_t i = 0; i < out.num_rows; i++ ) {
         for ( size_t j = 0; j < out.num_cols; j++ ) {
@@ -147,52 +158,70 @@ auto eye()
 //!             ~ operator indicates transpose operation.
 //! @{
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator+(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::add( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator+(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  vty_b__ const&                        rh ) noexcept
+auto operator+( matrix<vty_a__, m_, n_> const& lh, vty_b__ const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::scalar_add( lh.cdesc(), rh, out.desc(), out.mat_size );
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator-(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::subtract( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator-(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  vty_b__ const&                        rh ) noexcept
+auto operator-( matrix<vty_a__, m_, n_> const& lh, vty_b__ const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::scalar_add( lh.cdesc(), -rh, out.desc(), out.mat_size );
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator^(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::elem_multiply(
       lh.cdesc(),
       rh.cdesc(),
@@ -201,12 +230,19 @@ auto operator^(
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator/(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::elem_divide(
       lh.cdesc(),
       rh.cdesc(),
@@ -216,21 +252,17 @@ auto operator/(
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator/(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  vty_b__ const&                        rh ) noexcept
+auto operator/( matrix<vty_a__, m_, n_> const& lh, vty_b__ const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::scalar_divide( lh.cdesc(), rh, out.desc(), out.mat_size );
     return out;
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator/(
-  vty_b__ const&                        rh,
-  static_matrix<vty_a__, m_, n_> const& lh ) noexcept
+auto operator/( vty_b__ const& rh, matrix<vty_a__, m_, n_> const& lh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::scalar_divide_by_mat(
       lh.cdesc(),
       rh,
@@ -240,101 +272,138 @@ auto operator/(
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator*(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  vty_b__ const&                        rh ) noexcept
+auto operator*( matrix<vty_a__, m_, n_> const& lh, vty_b__ const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, n_> out;
     matrix_impl::scalar_multiply( lh.cdesc(), rh, out.desc(), out.mat_size );
     return out;
 }
-//
-// template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-// auto operator*(
-//  vty_b__ const&                        rh,
-//  static_matrix<vty_a__, m_, n_> const& lh ) noexcept
-//{
-//    return lh * rh;
-//}
+
+template <typename vty_a__, size_t m_, size_t n_>
+auto operator-( matrix<vty_a__, m_, n_> const& lh ) noexcept
+{
+    matrix<vty_a__, m_, n_> out;
+    matrix_impl::negate( lh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
+
+template <typename vty_a__, size_t m_, size_t n_>
+auto operator~( matrix<vty_a__, m_, n_> const& lh ) noexcept
+{
+    matrix<vty_a__, n_, m_> out;
+    matrix_impl::transpose( lh.cdesc(), out.desc(), out.mat_size );
+    return out;
+}
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_, size_t l_>
 auto operator*(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, n_, l_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, n_, l_> const& rh ) noexcept
 {
-    static_matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, l_> out;
+    matrix<matrix_impl::multiply_result_t<vty_a__, vty_b__>, m_, l_> out;
     matrix_impl::multiply( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
 // Logical operations
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator&&(
-    static_matrix<vty_a__, m_, n_> const& lh,
-    static_matrix<vty_b__, m_, n_> const& rh) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
-    matrix_impl::logic_and(lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size);
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
+    matrix_impl::logic_and( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator||(
-    static_matrix<vty_a__, m_, n_> const& lh,
-    static_matrix<vty_b__, m_, n_> const& rh) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
-    matrix_impl::logic_or(lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size);
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
+    matrix_impl::logic_or( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator==(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
     matrix_impl::equals( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator==(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  vty_b__ const&                        rh ) noexcept
+auto operator==( matrix<vty_a__, m_, n_> const& lh, vty_b__ const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    matrix<bool, m_, n_> out;
     matrix_impl::scalar_equals( lh.cdesc(), rh, out.desc(), out.mat_size );
     return out;
-} 
+}
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator!=(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
     matrix_impl::not_equals( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator!=(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  vty_b__ const&                        rh ) noexcept
+auto operator!=( matrix<vty_a__, m_, n_> const& lh, vty_b__ const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    matrix<bool, m_, n_> out;
     matrix_impl::scalar_neq( lh.cdesc(), rh, out.desc(), out.mat_size );
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator>(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
     matrix_impl::greater_than(
       lh.cdesc(),
       rh.cdesc(),
@@ -344,21 +413,26 @@ auto operator>(
 }
 
 template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator>(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  vty_b__ const&                        rh ) noexcept
+auto operator>( matrix<vty_a__, m_, n_> const& lh, vty_b__ const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    matrix<bool, m_, n_> out;
     matrix_impl::scalar_gt( lh.cdesc(), rh, out.desc(), out.mat_size );
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator>=(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
     matrix_impl::greater_or_equal(
       lh.cdesc(),
       rh.cdesc(),
@@ -367,22 +441,36 @@ auto operator>=(
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator<(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
     matrix_impl::less_than( lh.cdesc(), rh.cdesc(), out.desc(), out.mat_size );
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
+template <
+  typename vty_a__,
+  typename vty_b__,
+  size_t m_,
+  size_t n_,
+  size_t l_,
+  size_t g_>
 auto operator<=(
-  static_matrix<vty_a__, m_, n_> const& lh,
-  static_matrix<vty_b__, m_, n_> const& rh ) noexcept
+  matrix<vty_a__, m_, n_> const& lh,
+  matrix<vty_b__, l_, g_> const& rh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    static_assert( m_ == l_ && n_ == g_, "Must have same dimensions" );
+    matrix<bool, m_, n_> out;
     matrix_impl::less_or_equal(
       lh.cdesc(),
       rh.cdesc(),
@@ -391,10 +479,10 @@ auto operator<=(
     return out;
 }
 
-template <typename vty_a__, typename vty_b__, size_t m_, size_t n_>
-auto operator!( static_matrix<vty_a__, m_, n_> const& lh ) noexcept
+template <typename vty_a__, size_t m_, size_t n_>
+auto operator!( matrix<vty_a__, m_, n_> const& lh ) noexcept
 {
-    static_matrix<bool, m_, n_> out;
+    matrix<bool, m_, n_> out;
     matrix_impl::not( lh.cdesc(), out.desc(), out.mat_size );
     return out;
 }

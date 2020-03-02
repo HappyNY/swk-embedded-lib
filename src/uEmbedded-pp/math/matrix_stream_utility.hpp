@@ -17,7 +17,7 @@ std::string to_string( upp::math::matrix_impl::cdesc<vty__> desc )
             str += std::to_string( desc.dptr__[desc.col__ * i + j] );
 
             if ( j + 1 != desc.col__ ) {
-                str += ", ";
+                str += "  ";
             }
         }
         if ( i + 1 != desc.row__ ) {
@@ -36,14 +36,14 @@ std::string to_string( upp::math::matrix_impl::desc<vty__> desc )
 }
 
 template <typename vty__, size_t r_, size_t c_>
-std::string to_string( upp::math::static_matrix<vty__, r_, c_> const& r )
+std::string to_string( upp::math::matrix<vty__, r_, c_> const& r )
 {
     return to_string( r.cdesc() );
 }
 
 template <typename vty__, size_t r_, size_t c_>
 std::ostream&
-operator<<( std::ostream& os, upp::math::static_matrix<vty__, r_, c_> const& r )
+operator<<( std::ostream& os, upp::math::matrix<vty__, r_, c_> const& r )
 {
     return os << to_string( r.cdesc() );
 }
